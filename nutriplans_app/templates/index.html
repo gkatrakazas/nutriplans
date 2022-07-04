@@ -1,0 +1,62 @@
+<style>
+
+
+
+
+    .layout {
+  width: 100%;
+  background-color: rgba(255, 127, 80, 0.2);
+    min-height: 100%;
+  display: grid;
+  padding: 2%;
+  grid:
+    "column1 column2" 100%
+    / 1fr 1fr;
+  gap: 8px;
+
+  align-content: start;
+  align-items: center;
+}
+
+.column1 { grid-area: column1; }
+.column2 { grid-area: column2; }
+
+</style>
+<body>
+    <nav>
+        {% include "./base.html" %}
+    </nav>
+    <section class="layout">
+        <div class="column1">
+    
+          <h2>Are you a Nutritionist ?<br> Let's Start</h2>
+          <a class="nav-link btn text-white" style="background-color: coral;" type="button" data-toggle="modal" data-target="#signup_modal">Sign up for free</a>
+        </div>
+        <div class="column2">2</div>
+      </section>
+
+      <!--
+    <div id="index_contect1">
+        <div class="row" style="height:100%;">
+            <div class="column container_top_bar" style="width:50%;">
+
+                    <div class=" centered-element">
+                        <h2>Are you a Nutritionist ?<br> Let's Start</h2>
+                        <a class="nav-link btn text-white" style="background-color: coral;" type="button" data-toggle="modal" data-target="#signup_modal">Sign up for free</a>
+
+                    </div>
+                
+            </div>
+            <div class="column container_top_bar" style="width:50%;">
+
+                <div class=" centered-element">
+                    <h2>Are you a Nutritionist ?<br> Let's Start</h2>
+                    <a class="nav-link btn text-white" style="background-color: coral;" type="button" data-toggle="modal" data-target="#signup_modal">Sign up for free</a>
+
+                </div>
+            
+        </div>
+        </div>
+    </div>
+    -->
+</body>

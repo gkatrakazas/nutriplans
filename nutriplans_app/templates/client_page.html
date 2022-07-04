@@ -1,0 +1,203 @@
+<head>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/client_info_table.css' %}"/>
+
+</head>
+<style>
+
+thead tr th {
+  position: sticky;
+  top: 0;
+}
+
+.tableWrap {
+  -moz-box-shadow:    inset 0 0 5px #000000;
+  -webkit-box-shadow: inset 0 0 5px #000000;
+  box-shadow:         inset 0 0 5px #000000;
+  height: 300px;
+  overflow: auto;
+}
+
+/* If we use border,
+we must use table-collapse to avoid
+a slight movement of the header row */
+table {
+ border-collapse: collapse;
+}
+
+
+
+.layout {
+  width: 100%;
+  background-color: rgba(255, 127, 80, 0.2);
+    min-height: 100%;
+  display: grid;
+  padding: 2%;
+  grid:
+    "column1 column2" 100%
+    / 30% 70%;
+  gap: 8px;
+
+  align-content: start;
+  align-items: start;
+}
+
+.column1 { grid-area: column1; }
+.column2 { grid-area: column2; }
+
+#client_info_table1 td{
+  padding:10px;
+  padding-left:12px;
+  padding-right:12px;
+  
+}
+</style>
+
+
+<body>
+  <nav>
+      {% include "./base.html" %}
+  </nav>
+  <section class="layout">
+    
+      <div class="column1 ">
+
+        <h3>Client Information</h3>
+        
+        {% if action_info == 'show' %}
+        <form method="post">
+          {% csrf_token %}
+          <table style="overflow-x:auto; width:100%" id="client_info_table1">
+            {% for field in target_client %}
+            <input type="hidden" name="target_row" value="{{field.id}}" >
+            <tr>
+              <th>Name</th>
+              <td>{{ field.name }}</td>
+            </tr>
+            <tr>
+              <th>Status</th>
+              <td>{{ field.status }}</td>
+            </tr>
+            <tr>
+              <th>Gender</th>
+              <td>{{ field.gender }}</td>
+            </tr>
+            <tr>
+              <th>Birthday</th>
+              <td>{{ field.birthday }}</td>
+            </tr>
+            <tr>
+              <th>Age</th>
+              <td>{{ field.age }}</td>
+            </tr>
+            <tr>
+              <th>Height</th>
+              <td>{{ field.height }}</td>
+            </tr>
+            <tr>
+              <th>Current Weight</th>
+              <td>{{ field.current_weight }}</td>
+            </tr>
+            <tr>
+              <th>Target Weight</th>
+              <td>{{ field.target_weight }}</td>
+            </tr>
+            <tr>
+              <th>Email</th>
+              <td>{{ field.email }}</td>
+            </tr>
+            <tr>
+              <th>Adress</th>
+              <td>{{ field.address }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+          <div class="submit_buttons" style="float: right; margin-top:2%;">
+            <button class="btn btn-primary" style="background-color:coral; border-color:coral;" type="submit" name="action_button" value="edit_client_info"><i class="fa fa-edit"></i> Edit</button>
+          </div>
+        </form>
+        
+        {% elif action_info == 'edit' %}
+        <form method="post">
+          {% csrf_token %}
+          <table style="overflow-x:auto; width:100%" id="client_info_table2">
+            
+            {% for field in edit_client %}
+            <tr>
+              <th>{{ field.label}}</th>
+              <td>{{ field}}</td>
+              {% for error in field.errors %}
+                <p style="color: red">{{ error }}</p>
+              {% endfor %}
+            </tr>
+            {%  endfor %}
+          </table> 
+          <div class="submit_buttons" style="float: right; margin-top:2%;">
+            <button class="btn btn-danger"   type="submit" name="action_button" value="cancel_client_info"><i class=""></i> Cancel</button>
+            <button class="btn btn-primary"  type="submit" name="action_button" value="save_client_info"><i class="fa fa-save"></i> Save</button>
+          </div>
+        </form>
+        {% endif %}
+  
+      </div>
+
+      <div class="column2">
+
+        <center>
+          <button type="button" class="btn btn-primary btn-lg" style="margin:3%; background-color: coral; border: 0;" data-toggle="modal" data-target="#add_measurements_modal"> <i class="fa fa-plus"></i> Add Measurment
+          </button>
+        </center>
+
+        {% include "./add_measurements_modal.html" %}
+        <div class="tableWrap">
+        <table class="table center" id="client_table" >
+          <thead>
+            <th>Date</th>
+            <th>Weight</th>
+            <th>Fat</th>
+            <th>Muscle mass</th>
+            <th>Bone mass</th>
+            <th>Liguids</th>
+            <th>Vinceral fat</th>
+            <th></th>
+
+          </thead>
+          <tbody style="margin:20px;">
+            <tr>
+              {% for field in client_measurements %}
+                <tr id="measurements_{{}field.id}" onclick="myFunction()">
+
+                  <form method="post">
+                    {% csrf_token %}
+                    <td>{{field.date}}</td>
+                    <td>{{field.weight}}</td>
+                    <td>{{field.fat}}</td>
+                    <td>{{field.muscle_mass}}</td>
+                    <td>{{field.bone_mass}}</td>
+                    <td>{{field.liquids}}</td>
+                    <td>{{field.vinceral_fat}}</td>
+
+                    <td> <button type="submit" style="background-color: transparent;" id="save_button" name="action_button" value="view_button"><i class='fa fa-edit'></i></button> </td>
+                  </form>
+                </tr>
+              {% endfor %}
+              
+              
+             
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      </div>
+    
+  </section>
+
+  <script>
+    function myFunction() {
+      alert("Hello World");
+    }
+    </script>
+    
+
+  

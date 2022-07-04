@@ -1,0 +1,48 @@
+<head>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+</head>
+<div class="modal fade" id="signup_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+
+    <div class="modal-header text-center">
+      <h4 class="modal-title w-100 font-weight-bold">Sign up</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    
+    <div class="modal-body mx-3">
+      <p class="text-success text-center">Some message goes here</p>
+      <form method="post" action="signup">
+        {% csrf_token %}
+        {% for field in form %}
+          <p>
+           
+            {{ field }}
+            {% if field.help_text %}
+              <small style="color: grey">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+              <p style="color: red">{{ error }}</p>
+            {% endfor %}
+          </p>
+        {% endfor %}
+        <button type="submit">Sign up</button>
+      </form>
+      
+
+    </div>
+
+  </div>
+</div>
+</div>
+{% if openmodal == 'signup' %}
+
+<script>
+  $('#signup_modal').modal('show');
+</script>
+{% endif %}
+
