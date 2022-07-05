@@ -19,6 +19,8 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.WARNING: 'warning',
                 message_constants.ERROR: 'danger',}
 
+from django.core import serializers
+
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
@@ -229,4 +231,6 @@ def client_page(request,user_id,client_id):
 
     edit_client = AddPatients(initial={'id':target_client[0].id,'name': target_client[0].name,'status': target_client[0].status,'gender': target_client[0].gender,'birthday': target_client[0].birthday,'age': target_client[0].age,'height': target_client[0].height,'current_weight': target_client[0].current_weight,'target_weight':target_client[0].current_weight,'target_weight':target_client[0].target_weight,'email':target_client[0].email,'phone':target_client[0].phone,'address':target_client[0].address})
 
-    return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show','add_measurment_form':add_measurment_form})
+    data = serializers.serialize("json",Measurements.objects.all().order_by('date').filter(patient=client_id))
+    print(data)
+    return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show','add_measurment_form':add_measurment_form,'data':data})

@@ -2,8 +2,21 @@
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/client_info_table.css' %}"/>
 
+    <!-- for chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
+<body>
 </head>
 <style>
+
+.selected_measurment{
+  background-color: white;
+}
+
+#measurements_table tr {
+    cursor: pointer;
+}
 
 thead tr th {
   position: sticky;
@@ -14,7 +27,7 @@ thead tr th {
   -moz-box-shadow:    inset 0 0 5px #000000;
   -webkit-box-shadow: inset 0 0 5px #000000;
   box-shadow:         inset 0 0 5px #000000;
-  height: 300px;
+  height: 230px;
   overflow: auto;
 }
 
@@ -51,6 +64,7 @@ table {
   padding-right:12px;
   
 }
+
 </style>
 
 
@@ -80,7 +94,7 @@ table {
             </tr>
             <tr>
               <th>Gender</th>
-              <td>{{ field.gender }}</td>
+              <td id="id_gender">{{ field.gender }}</td>
             </tr>
             <tr>
               <th>Birthday</th>
@@ -88,11 +102,11 @@ table {
             </tr>
             <tr>
               <th>Age</th>
-              <td>{{ field.age }}</td>
+              <td id="id_age">{{ field.age }}</td>
             </tr>
             <tr>
               <th>Height</th>
-              <td>{{ field.height }}</td>
+              <td id="id_height">{{ field.height }}</td>
             </tr>
             <tr>
               <th>Current Weight</th>
@@ -150,7 +164,7 @@ table {
 
         {% include "./add_measurements_modal.html" %}
         <div class="tableWrap">
-        <table class="table center" id="client_table" >
+        <table class="table center" id="measurements_table" >
           <thead>
             <th>Date</th>
             <th>Weight</th>
@@ -159,13 +173,16 @@ table {
             <th>Bone mass</th>
             <th>Liguids</th>
             <th>Vinceral fat</th>
+            <th>BMR</th>
+            <th>BMI</th>
+            <th>I.B.</th>
             <th></th>
 
           </thead>
           <tbody style="margin:20px;">
             <tr>
               {% for field in client_measurements %}
-                <tr id="measurements_{{}field.id}" onclick="myFunction()">
+                <tr>
 
                   <form method="post">
                     {% csrf_token %}
@@ -176,6 +193,9 @@ table {
                     <td>{{field.bone_mass}}</td>
                     <td>{{field.liquids}}</td>
                     <td>{{field.vinceral_fat}}</td>
+                    <td id="bmr_{{field.id}}"></td>
+                    <td id="bmi_{{field.id}}"></td>
+                    <td id="ib_{{field.id}}"></td>
 
                     <td> <button type="submit" style="background-color: transparent;" id="save_button" name="action_button" value="view_button"><i class='fa fa-edit'></i></button> </td>
                   </form>
@@ -187,17 +207,156 @@ table {
           </tr>
           </tbody>
         </table>
-      </div>
+        </div>
+        
+        
+        
 
+        <canvas id="myChart" style="width:100%;"></canvas>
       </div>
     
   </section>
 
-  <script>
-    function myFunction() {
-      alert("Hello World");
-    }
-    </script>
+
+<script>
+  window.onload = function afterWebPageLoad(){
+    let gender = document.getElementById("id_gender").innerText; 
+    let age = document.getElementById("id_age").innerText; 
+    let height = document.getElementById("id_height").innerText;
+    let weight=-1;
+
+    let bmr=-1;
+    let ib=-1;
+    let bmi=-1;
     
+
+    var data = JSON.parse("{{data|escapejs}}");
+      for (const [key, value] of Object.entries(data)) {
+        console.log('--->',key, data[key].pk);
+        
+        weight = data[key].fields.weight;
+        
+        if (gender == 'Male'){
+          
+
+          bmr = weight*13.75+66.5+height*5-6.78*age;
+          ib= (height*height)*22.7/10000;
+
+        } else if (gender == 'Female'){
+
+          bmr=655+9.56*weight+1.85*height-4.68*age;
+          ib= (height*height)*22.4/10000;   
+
+        }
+        bmi = (weight/(height*height))*10000;
+        document.getElementById('bmr_'+data[key].pk).innerText = bmr.toFixed(2);
+        document.getElementById('bmi_'+data[key].pk).innerText = bmi.toFixed(2);    
+        document.getElementById('ib_'+data[key].pk).innerText = ib.toFixed(2);
+        
+      }
+  }
+</script>
+    
+    <script>
+
+      var dict = []; // create an empty array
+
+      var data = JSON.parse("{{data|escapejs}}");
+      for (const [key, value] of Object.entries(data)) {
+        console.log(key, data[key].fields.date);
+        dict.push({
+            date:   data[key].fields.date,
+            weight: data[key].fields.weight,
+            fat: data[key].fields.fat,
+            muscle_mass	: data[key].fields.muscle_mass,
+            bone_mass: data[key].fields.bone_mass,
+            liguids: data[key].fields.liguids,
+            vinceral_fat: data[key].fields.vinceral_fat
+            });
+      }
+      
+      const date = []
+      const val_weight = []
+      const val_fat = []
+      const val_muscle_mass = []
+      const val_bone_mass = []
+      const val_liguids = []
+      const val_vinceral_fat = []
+
+      for (i in dict){
+
+        date.push(dict[i].date)
+        val_weight.push(dict[i].weight)
+        val_fat.push(dict[i].fat)
+        val_muscle_mass.push(dict[i].muscle_mass)
+        val_bone_mass.push(dict[i].bone_mass)
+        val_liguids.push(dict[i].liguids)
+        val_vinceral_fat.push(dict[i].vinceral_fat)
+      }
+
+      
+      var ctx = document.getElementById("myChart");
+      var lineChart = new Chart(ctx, {
+        type: 'line',
+    data: {
+        labels: date,
+        datasets: [
+        {
+          label: 'Weight',
+          borderColor: 'rgb(0,0,0)',
+          data: val_weight,
+        
+        },{
+        
+          label: 'Fat',
+          borderColor: 'rgb(0,0,255)',
+          data: val_fat,
+        },{
+        
+          label: 'Muscle mass',
+          borderColor: 'rgb(255,255,0)',
+          data: val_muscle_mass,
+        },{
+          
+          label: 'Bone Mass',
+          borderColor: 'rgb(128,128,128)',
+          data: val_bone_mass,
+        },{
+          
+          label: 'Liguids',
+          borderColor: 'rgb(255,0,255)',
+          data: val_liguids,
+        },{
+          
+          label: 'Vinceral Fat',
+          borderColor: 'rgb(0,255,255)',
+          data: val_vinceral_fat,
+        },
+      
+      
+      ],
+
+    },
+    options: {
+
+    scales: {
+      x: {
+        // The axis for this scale is determined from the first letter of the id as `'x'`
+        // It is recommended to specify `position` and / or `axis` explicitly.
+        type: 'time',
+        time: {
+          parser: 'YYYY-MM-DD',
+          unit: 'week',
+          displayFormats: {
+             month: 'DD/MM/YY'
+          },
+          tooltipFormat: 'DD/MM/YY'
+        },
+        
+      }
+          }
+    }
+});
+      </script>
 
   
