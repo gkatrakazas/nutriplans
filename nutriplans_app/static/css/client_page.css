@@ -1,0 +1,30 @@
+
+/* for tables */
+thead tr th {
+    position: sticky;
+    top: 0;
+}
+
+.tableWrap {
+  -moz-box-shadow:    inset 0 0 5px #000000;
+  -webkit-box-shadow: inset 0 0 5px #000000;
+  box-shadow:         inset 0 0 5px #000000;
+  height: 230px;
+  overflow: auto;
+}
+#client_info_table1 td{
+  padding:10px;
+  padding-left:12px;
+  padding-right:12px;
+  
+}
+
+
+/* If we use border,
+we must use table-collapse to avoid
+a slight movement of the header row 
+table {
+ border-collapse: collapse;
+}
+
+*/

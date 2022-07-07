@@ -38,14 +38,11 @@ def index(request):
     form = SignUpForm()
     return render(request, 'index.html',{'form': form})  
 
-def workspace(request):
-    print('in workspace')
-    return render(request, 'workspace.html')  
 
 # Create your views here.
 
 def signin(request):
-    print( 'hi')
+    print( 'signin')
     if request.method == 'POST': 
         username = request.POST['username']
         password = request.POST['password']
@@ -60,9 +57,9 @@ def signin(request):
                 
                 return redirect('workspace')
         else:
-            print('error')
+            return render(request, 'index.html',{'openmodal' : 'singin_modal','messages_signin':'username or password in wrong'}) 
     else:
-         return HttpResponse("Do something") 
+         return render(request, 'index.html',{'openmodal' : 'singin_modal','messages_signin':'you must login first'}) 
 
 def logout(request):
     print('logged out')
@@ -109,12 +106,16 @@ def signup(request):
 def workspace(request):
     if request.user.is_authenticated:
 
-        client_list = Patients.objects.all()
-        record_exist=Patients.objects.filter().exists()
-        print(record_exist)
+        login_user_id=request.user.id
+
+        # get all clients from current user
+        client_list = Patients.objects.all().filter(user_id=login_user_id)
+        
+        # get true or false if exists records
+        #record_exist=Patients.objects.filter().exists()
+        
         add_client_form=AddPatients()
         if request.method == 'POST':
-
             #add new client
             if request.POST.get('action_button')=='add_button':
                 print('add client time')
@@ -137,25 +138,28 @@ def workspace(request):
                     Patients.objects.create(name=name,status=status,gender=gender,birthday=birthday, age=age, height=height,current_weight=current_weight,target_weight=target_weight,email=email,phone=phone,address=address,user_id=request.user.id )
                     messages.success(request,''+name+' has been added! If you want to see  ')
                     
-                    return render(request, 'workspace.html',{'client_list':client_list,'record_exist':record_exist,'target_row':-1,'add_client_form':add_client_form})  
+                    return render(request, 'workspace.html',{'client_list':client_list,'target_row':-1,'add_client_form':add_client_form})  
 
                 else:
                     print('not valid')
                     openmodal='add_patient_modal'
-                    return render(request, 'workspace.html',{'client_list':client_list,'record_exist':record_exist,'target_row':-1,'add_client_form':add_client_form, 'openmodal':openmodal}) 
+                    return render(request, 'workspace.html',{'client_list':client_list,'target_row':-1,'add_client_form':add_client_form, 'openmodal':openmodal}) 
 
+            if request.POST.get('action_button')=='view_client_page':
+                #action="{% url 'client_page' field.user_id field.id %}"
+                print ('redirect')
+                target_client=request.POST['target_row']
+                return redirect('client_page',client_id=target_client)
             #view client page
-            
 
-        target_row=-1
-        return render(request, 'workspace.html',{'client_list':client_list,'record_exist':record_exist,'target_row':target_row,'add_client_form':add_client_form})  
+        return render(request, 'workspace.html',{'client_list':client_list,'add_client_form':add_client_form})  
     else:
-        form = SignUpForm()
-        openmodal='signin'
-        return render(request, 'index.html',{'form': form, 'openmodal':openmodal}) 
+        Sign_up_form = SignUpForm()
+        return render(request, 'index.html',{'Sign_up_form': Sign_up_form, 'openmodal':'signin'}) 
 
 
-def client_page(request,user_id,client_id):
+@group_required('Nutrition')
+def client_page(request,client_id):
 
     print('id= ',client_id)
     target_row=client_id
@@ -164,6 +168,13 @@ def client_page(request,user_id,client_id):
     target_client = Patients.objects.all().filter(id=client_id)
     client_measurements = Measurements.objects.all().order_by('-date').filter(patient=target_row)
     add_measurment_form = AddMeasurements()
+
+    # client data id user whant to edit
+    edit_client = AddPatients(initial={'id':target_client[0].id,'name': target_client[0].name,'status': target_client[0].status,'gender': target_client[0].gender,'birthday': target_client[0].birthday,'age': target_client[0].age,'height': target_client[0].height,'current_weight': target_client[0].current_weight,'target_weight':target_client[0].current_weight,'target_weight':target_client[0].target_weight,'email':target_client[0].email,'phone':target_client[0].phone,'address':target_client[0].address})
+    
+    #measurements data for chart
+    data = serializers.serialize("json",Measurements.objects.all().order_by('date').filter(patient=client_id))
+
     if request.method == 'POST':
         if request.POST.get('action_button')=='edit_client_info':
             print('edit time')
@@ -227,10 +238,5 @@ def client_page(request,user_id,client_id):
 
     else:
     
-        return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show'})
+        return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show','add_measurment_form':add_measurment_form,'data':data})
 
-    edit_client = AddPatients(initial={'id':target_client[0].id,'name': target_client[0].name,'status': target_client[0].status,'gender': target_client[0].gender,'birthday': target_client[0].birthday,'age': target_client[0].age,'height': target_client[0].height,'current_weight': target_client[0].current_weight,'target_weight':target_client[0].current_weight,'target_weight':target_client[0].target_weight,'email':target_client[0].email,'phone':target_client[0].phone,'address':target_client[0].address})
-
-    data = serializers.serialize("json",Measurements.objects.all().order_by('date').filter(patient=client_id))
-    print(data)
-    return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show','add_measurment_form':add_measurment_form,'data':data})

@@ -1,7 +1,7 @@
+<head>
+  {% load static %}
+</head>
 <style>
-
-
-
 
     .layout {
   width: 100%;
@@ -28,11 +28,38 @@
     </nav>
     <section class="layout">
         <div class="column1">
-    
-          <h2>Are you a Nutritionist ?<br> Let's Start</h2>
-          <a class="nav-link btn text-white" style="background-color: coral;" type="button" data-toggle="modal" data-target="#signup_modal">Sign up for free</a>
+          
+          <div style="width:40%; display: inline-block;">
+            <img alt="nutritionist" src="{% static 'nutritionist_icon.png' %}" width="300">
+          </div>
+          <div style="width:40%; display: inline-block;">
+            <h2>Are you a Nutritionist ?<br> Let's Start</h2>
+            <a class="nav-link btn text-white" style="background-color: coral;" type="button" data-toggle="modal" data-target="#signup_modal">Sign up for free</a>
+        
+          </div >
+          </div>
+        <div class="column2">
+          <div style="width:25%; display: inline-block;">
+            <img alt="nutritionist" src="{% static 'customer-review.png' %}" width="100">
+          </div>
+          <div style="width:65%; display: inline-block;">
+            <h3>List with all your clients, unlimited database </h3>        
+          </div >
+          <div style="width:25%; display: inline-block;">
+            <img alt="nutritionist" src="{% static 'profile.png' %}" width="100">
+          </div>
+          <div style="width:65%; display: inline-block;">
+            <h3>Client page for each one of them, with measurements, diagrams etc</h3>        
+          </div >
+          <div style="width:25%; display: inline-block;">
+            <img alt="nutritionist" src="{% static 'computer.png' %}" width="100">
+          </div>
+          <div style="width:65%; display: inline-block;">
+            <h3>Personal page, for each client to see her statistics</h3>        
+          </div >
+
+
         </div>
-        <div class="column2">2</div>
       </section>
 
       <!--

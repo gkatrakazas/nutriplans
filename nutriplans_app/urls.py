@@ -10,7 +10,7 @@ urlpatterns = [
     path('logout', views.logout, name = 'logout'), 
     path('',include("django.contrib.auth.urls")), 
     path('workspace', views.workspace, name = 'workspace'), 
-    path('client_page/<int:user_id>/<int:client_id>/', views.client_page, name = 'client_page'), 
+    path('client_page/<int:client_id>/', views.client_page, name = 'client_page'), 
     
 
 

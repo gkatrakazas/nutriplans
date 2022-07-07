@@ -81,23 +81,23 @@ tbody:before {line-height:1em; content:"\200C"; display:block;}
         <div class="element">
           <table class="table center" id="client_table" >
             <thead>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Gender</th>
-              <th>Birthday</th>
-              <th>Age</th>
-              <th>Height</th>
-              <th>Current Weight</th>
-              <th>Target Weight</th>
-              <th>Email</th>
-              <th>Address</th>
+              <th style="border-radius: 0;">Name</th>
+              <th style="border-radius: 0;">Status</th>
+              <th style="border-radius: 0;">Gender</th>
+              <th style="border-radius: 0;">Birthday</th>
+              <th style="border-radius: 0;">Age</th>
+              <th style="border-radius: 0;">Height</th>
+              <th style="border-radius: 0;">Current Weight</th>
+              <th style="border-radius: 0;">Target Weight</th>
+              <th style="border-radius: 0;">Email</th>
+              <th style="border-radius: 0;">Address</th>
             </thead>
             <tbody style="margin:20px;">
               <tr>
                 {% for field in client_list %}
                   <tr>
 
-                    <form method="post" action="{% url 'client_page' field.user_id field.id %}">
+                    <form method="post" >
                       {% csrf_token %}
                       <input type="hidden" name="target_row" value="{{field.id}}" >
                       <td>{{field.name}}</td>
@@ -110,7 +110,9 @@ tbody:before {line-height:1em; content:"\200C"; display:block;}
                       <td>{{field.target_weight}}</td>
                       <td>{{field.email}}</td>
                       <td>{{field.address}}</td>
-                      <td> <button type="submit" style="background-color: transparent;"><i class='fa fa-eye'></i></button> </td>
+                      <td> <button type="submit" name="action_button" value="view_client_page" style="background-color: transparent;"><i class='fa fa-eye'></i></button> </td>
+                      <td> <button type="submit" name="action_button" value="delete_client" style="background-color: transparent;"><i class='fa fa-trash'></i></button> </td>
+
                     </form>
                   </tr>
                 {% endfor %}

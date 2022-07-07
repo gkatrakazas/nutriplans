@@ -15,7 +15,11 @@
       </div>
       
       <div class="modal-body mx-3">
-        <p class="text-success text-center">Some message goes here</p>
+        {% if messages_signin %}
+        <div class="signin-alert-message" style="color:red ;">
+          {{ messages_signin }}
+        </div>
+        {% endif %}
         <form action="signin" method="post">
           {% csrf_token %}
           <div class="form-group">
