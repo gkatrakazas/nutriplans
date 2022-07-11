@@ -10,7 +10,7 @@ from django.db import models
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator 
 
-from nutriplans_app.models import Patients
+from nutriplans_app.models import Clients, Equivalents, Clients
 
 
 
@@ -82,7 +82,7 @@ from functools import partial
 
 DateInput = partial(forms.DateInput, {'class': 'datepicker'})
 
-class AddPatients(forms.Form):
+class AddClients(forms.Form):
     status_choices = (
         ('Active', 'Active'),
         ('Active', 'Inactive'),
@@ -98,8 +98,7 @@ class AddPatients(forms.Form):
     birthday = forms.DateField(label="Birthday", required=True,widget=forms.DateInput(attrs={'type': 'date','class':'form-control','onchange' : "find_age();"}))
     age = forms.IntegerField(label="Age",required=True,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'age auto fill by birthday date'}))
     height = forms.IntegerField(label="Height",required=True,validators=[MaxValueValidator(300),MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'height in cm'}))
-    current_weight = forms.IntegerField(label="Current Weight",required=False,validators=[MaxValueValidator(500),MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'current weight (optional)'}))
-    target_weight = forms.IntegerField(label="Target Weight",required=False,validators=[MaxValueValidator(500),MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'target weight (optional)'}))
+    target_weight = forms.FloatField(label="Target Weight",required=True,validators=[MaxValueValidator(500.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'target weight'}))
     email = forms.EmailField(label="Email", required=True,widget=forms.EmailInput(attrs={'class': 'form-control','placeholder': 'email'}), max_length=64)
     phone = forms.IntegerField(label="Phone Number", required=False,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'phone number (optional)'}))
     address = forms.CharField(label="Adress", required=False, max_length=100,widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'address (optional)'}))
@@ -115,14 +114,15 @@ class AddPatients(forms.Form):
 
 
     class Meta:
-        model = Patients
-        fields = ('name','status','gender','birthday', 'age', 'height','current_weight','target_weight','email','phone','address' )
+        model = Clients
+        fields = ('name','status','gender','birthday', 'age', 'height','target_weight','email','phone','address' )
 
 
 class AddMeasurements(forms.Form):
     
     date = forms.DateField(label="Date", required=True,widget=forms.DateInput(attrs={'type': 'date','class':'form-control'}))
-    weight = forms.FloatField(label="Weight",required=True,validators=[MaxValueValidator(500.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'weight'}))
+    activity_factor = forms.FloatField(label="Activity Factor",required=True,validators=[MaxValueValidator(3.0),MinValueValidator(1.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'activity factor'}))
+    weight = forms.FloatField(label="Weight",required=True,validators=[MaxValueValidator(500.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'weight'}))    
     fat = forms.FloatField(label="Fat",validators=[MaxValueValidator(100.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'fat %'}))
     muscle_mass = forms.FloatField(label="Muscle mass",validators=[MaxValueValidator(100.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'muscle mass %'}))
     bone_mass = forms.FloatField(label="Bone mass",validators=[MaxValueValidator(100.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'bone mass %'}))
@@ -133,5 +133,29 @@ class AddMeasurements(forms.Form):
             return self.date
 
     class Meta:
-        model = Patients
+        model = Clients
         fields = ('date','weight','fat','muscle_mass', 'bone_mass', 'liquids','vinceral_fat')
+
+
+class EditEquivalents(forms.Form):
+    target_calories = forms.FloatField(label="Target Calories",required=True,validators=[MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'target calories'}))
+    carbohydrates_percent = forms.IntegerField(label="Carbohydrates %",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'carbohydrates %'}))
+    proteins_percent= forms.IntegerField(label="Proteins %",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'proteins %'}))
+    fat_percent= forms.IntegerField(label="Fat %",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'fat %'}))
+    full_milk = forms.IntegerField(label="Full Milk",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'full milk','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    semi_milk = forms.IntegerField(label="Semi Milk",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'semi milk','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    zero_milk = forms.IntegerField(label="zero Milk",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'zero milk','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    fruits = forms.IntegerField(label="Fruits",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'fruits','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    vegetables = forms.IntegerField(label="Vegetables",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'vegetables','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    bread_cereals = forms.IntegerField(label="Bread/Cereals",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'bread/cereals','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    full_meat = forms.IntegerField(label="Full Meat",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'full meat','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    semi_meat = forms.IntegerField(label="Semi Meat",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'semi meat','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    zero_meat = forms.IntegerField(label="Zero Meat",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'zero meat','onkeyup' : "updateequiv();",'onChange' : "updateequiv();"}))
+    fat = forms.IntegerField(label="Fat",required=True,validators=[MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'fat'}))
+
+    def __str__(self):
+        return self.target_calories
+
+    class Meta:
+        model = Equivalents
+        fields = ('target_calories','carbohydrates_percent','proteins_percent','fat_percent', 'full_milk', 'semi_milk','zero_milk','fruits','vegetables','bread_cereals','full_meat','semi_meat','zero_meat','fat')

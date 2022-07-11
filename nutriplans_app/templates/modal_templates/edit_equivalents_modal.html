@@ -1,0 +1,296 @@
+<style>
+  #equiv tr {
+    border: solid 3px rgba(255, 127, 80, 0.2);
+  }
+</style>
+
+<div class="modal fade" id="edit_equivalents_modal" tabindex="-1" role="dialog" aria-labelledby="edit_equivalents_modallLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:100%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit_equivalents_modalLabel">Edit Equivalents</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="post">
+          <div class="modal-body">
+
+            {% csrf_token %}
+            <input type="hidden" name="target_equiv_id" value="{{edit_equiv.id}}" >
+            <table >
+              <tr>
+                <th style="width:25%;">{{edit_equiv.target_calories.label}}</th>
+                <th style="width:25%;">{{edit_equiv.carbohydrates_percent.label}}</th>
+                <th style="width:25%;">{{edit_equiv.proteins_percent.label}}</th>
+                <th style="width:25%;">{{edit_equiv.fat_percent.label}}</th>
+                
+              </tr>
+              <tr>
+                <td>{{edit_equiv.target_calories}}</td>
+                <td>{{edit_equiv.carbohydrates_percent}}</td>
+                <td>{{edit_equiv.proteins_percent}}</td>
+                <td>{{edit_equiv.fat_percent}}</td>
+              </tr>
+            </table>
+
+            <table id="equiv">
+              <tr>
+                <th style="width:10%;"></th>
+                <th style="width:10%;">Equivalents</th>
+                <th style="width:20%;">Carbohydrates</th>
+                <th style="width:20%;">Proteins</th>
+                <th style="width:20%;">Fat</th>
+                <th style="width:20%;">Calories</th>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.full_milk.label}}</th>
+                <td>{{edit_equiv.full_milk}}</td>
+                <td id="full_milk_carbohydrates"></td>
+                <td id="full_milk_proteins"></td>
+                <td id="full_milk_fat"></td>
+                <td id="full_milk_calories"></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.semi_milk.label}}</th>
+                <td>{{edit_equiv.semi_milk}}</td>
+                <td id="semi_milk_carbohydrates"> </td>
+                <td id="semi_milk_proteins"> </td>
+                <td id="semi_milk_fat"></td>
+                <td id="semi_milk_calories"></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.zero_milk.label}}</th>
+                <td>{{edit_equiv.zero_milk}}</td>
+                <td> <p id="zero_milk_carbohydrates"></p> </td>
+                <td> <p id="zero_milk_proteins"></p> </td>
+                <td> <p id="zero_milk_fat"></p></td>
+                <td> <p id="zero_milk_calories"></p></td>
+
+              </tr>
+              <tr>
+                <th>{{edit_equiv.fruits.label}}</th>
+                <td>{{edit_equiv.fruits}}</td>
+                <td id="fruits_carbohydrates"> </td>
+                <td id="fruits_proteins"> </td>
+                <td id="fruits_fat"></td>
+                <td id="fruits_calories"></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.vegetables.label}}</th>
+                <td>{{edit_equiv.vegetables}}</td>
+                <td id="vegetables_carbohydrates"></td>
+                <td id="vegetables_proteins"> </td>
+                <td id="vegetables_fat"></td>
+                <td id="vegetables_calories"></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.bread_cereals.label}}</th>
+                <td>{{edit_equiv.bread_cereals}}</td>
+                <td id="bread_cereals_carbohydrates"> </td>
+                <td id="bread_cereals_proteins"> </td>
+                <td id="bread_cereals_fat"></td>
+                <td id="bread_cereals_calories"></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.full_meat.label}}</th>
+                <td>{{edit_equiv.full_meat}}</td>
+                <td id="full_meat_carbohydrates"> </td>
+                <td id="full_meat_proteins"> </td>
+                <td id="full_meat_fat"></td>
+                <td id="full_meat_calories"></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.semi_meat.label}}</th>
+                <td>{{edit_equiv.semi_meat}}</td>
+                <td> <p id="semi_meat_carbohydrates"></p> </td>
+                <td> <p id="semi_meat_proteins"></p> </td>
+                <td> <p id="semi_meat_fat"></p></td>
+                <td> <p id="semi_meat_calories"></p></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.zero_meat.label}}</th>
+                <td>{{edit_equiv.zero_meat}}</td>
+                <td> <p id="zero_meat_carbohydrates"></p> </td>
+                <td> <p id="zero_meat_proteins"></p> </td>
+                <td> <p id="zero_meat_fat"></p></td>
+                <td> <p id="zero_meat_calories"></p></td>
+              </tr>
+              <tr>
+                <th>{{edit_equiv.fat.label}}</th>
+                <td>{{edit_equiv.fat}}
+                  {% for edit_equiv.fat in edit_equiv.fat.errors %}
+                    <p style="color: red">{{ error }}</p>
+                  {% endfor %}
+                </td>
+                <td> <p id="fat_carbohydrates"></p> </td>
+                <td> <p id="fat_proteins"></p> </td>
+                <td> <p id="fat_fat"></p></td>
+                <td> <p id="fat_calories"></p></td>
+              </tr>
+              <tr>
+              <tr style="background-color: rgb(255, 230, 220);">
+                <th>Total (Gr)</th>
+                <td></td>
+                <td style="padding:8px;" id="total_gr_carbohydrates"></td>
+                <td  id="total_gr_proteins"></td>
+                <td  id="total_gr_fat"></td>
+                <td></td>
+              </tr>
+              <tr style="background-color: rgb(255, 230, 220);">
+                <th>Total (Cal)</th>
+                <td></td>
+                <td style="padding:8px;" id="total_cal_carbohydrates"></td>
+                <td id="total_cal_proteins"></td>
+                <td id="total_cal_fat"></td>
+                <td id="total_cal"></td>
+              </tr>
+              <tr style="background-color: rgb(255, 230, 220);">
+                <th>Percent (%)</th>
+                <td></td>
+                <td style="padding:8px;" id="total_per_carbohydrates"></td>
+                <td id="total_per_proteins"></td>
+                <td id="total_per_fat"></td>
+                <td></td>
+              </tr>
+            </table>
+            
+    
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" style="border-color:coral; background-color:coral;" name="action_button" value="save_equivalents_modal_button" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateequiv(){
+      
+      let full_milk_val=document.getElementsByName("full_milk")[0].value
+      if (full_milk_val==""){
+        full_milk_val=0;
+      }
+
+      let semi_milk_val=document.getElementsByName("semi_milk")[0].value
+      if (semi_milk_val==""){
+        semi_milk_val=0;
+      }
+
+      let zero_milk_val=document.getElementsByName("zero_milk")[0].value
+      if (zero_milk_val==""){
+        zero_milk_val=0;
+      }
+
+      let fruits_val=document.getElementsByName("fruits")[0].value
+      if (fruits_val==""){
+        fruits_val=0;
+      }
+
+      let vegetables_val=document.getElementsByName("vegetables")[0].value
+      if (vegetables_val==""){
+        vegetables_val=0;
+      }
+
+      let bread_cereals_val=document.getElementsByName("bread_cereals")[0].value
+      if (bread_cereals_val==""){
+        bread_cereals_val=0;
+      }
+      
+      let full_meat_val=document.getElementsByName("full_meat")[0].value;
+      if (full_meat_val==""){
+        full_meat_val=0;
+      }
+      
+      let semi_meat_val=document.getElementsByName("semi_meat")[0].value;
+      if (semi_meat_val==""){
+        semi_meat_val=0;
+      }
+      
+      let zero_meat_val=document.getElementsByName("zero_meat")[0].value;
+      if (zero_meat_val==""){
+        zero_meat_val=0;
+      }
+      
+      let fat_val=document.getElementsByName("fat")[0].value;
+      if (fat_val==""){
+        fat_val=0;
+      }
+
+      document.getElementById('full_milk_carbohydrates').innerHTML = full_milk_val*12;
+      document.getElementById('full_milk_proteins').innerHTML =      full_milk_val*8;
+      document.getElementById('full_milk_fat').innerHTML =           full_milk_val*8;
+      document.getElementById('full_milk_calories').innerHTML =      full_milk_val*152;
+
+      document.getElementById('semi_milk_carbohydrates').innerHTML = semi_milk_val*12;
+      document.getElementById('semi_milk_proteins').innerHTML = semi_milk_val*8;
+      document.getElementById('semi_milk_fat').innerHTML = semi_milk_val*5;
+      document.getElementById('semi_milk_calories').innerHTML = semi_milk_val*125;
+
+      document.getElementById('zero_milk_carbohydrates').innerHTML = zero_milk_val*12;
+      document.getElementById('zero_milk_proteins').innerHTML = zero_milk_val*8;
+      document.getElementById('zero_milk_fat').innerHTML = zero_milk_val*0;
+      document.getElementById('zero_milk_calories').innerHTML = zero_milk_val*80;
+
+      document.getElementById('fruits_carbohydrates').innerHTML = fruits_val*15;
+      document.getElementById('fruits_proteins').innerHTML = fruits_val*0;
+      document.getElementById('fruits_fat').innerHTML = fruits_val*0;
+      document.getElementById('fruits_calories').innerHTML = fruits_val*60;
+
+      document.getElementById('vegetables_carbohydrates').innerHTML = vegetables_val*5;
+      document.getElementById('vegetables_proteins').innerHTML = vegetables_val*2;
+      document.getElementById('vegetables_fat').innerHTML = vegetables_val*0;
+      document.getElementById('vegetables_calories').innerHTML = vegetables_val*28;
+
+      document.getElementById('bread_cereals_carbohydrates').innerHTML = bread_cereals_val*15;
+      document.getElementById('bread_cereals_proteins').innerHTML = bread_cereals_val*3;
+      document.getElementById('bread_cereals_fat').innerHTML = bread_cereals_val*0;
+      document.getElementById('bread_cereals_calories').innerHTML = bread_cereals_val*72;
+
+      document.getElementById('full_meat_carbohydrates').innerHTML = full_meat_val*0;
+      document.getElementById('full_meat_proteins').innerHTML = full_meat_val*7;
+      document.getElementById('full_meat_fat').innerHTML = full_meat_val*8;
+      document.getElementById('full_meat_calories').innerHTML = full_meat_val*100;
+
+      document.getElementById('semi_meat_carbohydrates').innerHTML = semi_meat_val*0;
+      document.getElementById('semi_meat_proteins').innerHTML = semi_meat_val*7;
+      document.getElementById('semi_meat_fat').innerHTML = semi_meat_val*5;
+      document.getElementById('semi_meat_calories').innerHTML = semi_meat_val*73;
+
+      document.getElementById('zero_meat_carbohydrates').innerHTML = zero_meat_val*0;
+      document.getElementById('zero_meat_proteins').innerHTML = zero_meat_val*7;
+      document.getElementById('zero_meat_fat').innerHTML = zero_meat_val*3;
+      document.getElementById('zero_meat_calories').innerHTML = zero_meat_val*55;
+
+      document.getElementById('fat_carbohydrates').innerHTML = fat_val*0;
+      document.getElementById('fat_proteins').innerHTML = fat_val*0;
+      document.getElementById('fat_fat').innerHTML = fat_val*5;
+      document.getElementById('fat_calories').innerHTML = fat_val*45;
+
+      total_gr_carbohydrates_val=full_milk_val*12+semi_milk_val*12+zero_milk_val*12+fruits_val*15+vegetables_val*5+bread_cereals_val*15;
+      total_gr_proteins_val = full_milk_val*8+semi_milk_val*8+zero_milk_val*8+fruits_val*0+vegetables_val*2+bread_cereals_val*3+full_meat_val*7+semi_meat_val*7+zero_meat_val*7+fat_val*0;
+      total_gr_fat_val = full_milk_val*8+semi_milk_val*5+full_meat_val*8+semi_meat_val*5+zero_meat_val*3+fat_val*5;
+      
+      document.getElementById('total_gr_carbohydrates').innerHTML = total_gr_carbohydrates_val;
+      document.getElementById('total_gr_proteins').innerHTML = total_gr_proteins_val;
+      document.getElementById('total_gr_fat').innerHTML = total_gr_fat_val;
+
+      total_cal_carbohydrates_val = total_gr_carbohydrates_val*4;
+      total_cal_proteins_val = total_gr_proteins_val*4;
+      total_cal_fat_val = total_gr_fat_val*9;
+
+      total_cal_val=total_cal_carbohydrates_val+total_cal_proteins_val+total_cal_fat_val;
+
+      document.getElementById('total_cal_carbohydrates').innerHTML = total_cal_carbohydrates_val;
+      document.getElementById('total_cal_proteins').innerHTML = total_cal_proteins_val;
+      document.getElementById('total_cal_fat').innerHTML = total_cal_fat_val;
+      document.getElementById('total_cal').innerHTML = total_cal_val;
+
+      document.getElementById('total_per_carbohydrates').innerHTML = ((total_cal_carbohydrates_val/total_cal_val)*100).toFixed(2);
+      document.getElementById('total_per_proteins').innerHTML = ((total_cal_proteins_val/total_cal_val)*100).toFixed(2);
+      document.getElementById('total_per_fat').innerHTML = ((total_cal_fat_val/total_cal_val)*100).toFixed(2);
+
+    }
+  </script>

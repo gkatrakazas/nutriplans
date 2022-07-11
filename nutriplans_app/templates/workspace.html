@@ -76,7 +76,7 @@ tbody:before {line-height:1em; content:"\200C"; display:block;}
           <i class='fa fa-user-plus'></i> Add Client
         </button>
 
-        {% include "./add_client_modal.html" %}
+        {% include "./modal_templates/add_client_modal.html" %}
 
         <div class="element">
           <table class="table center" id="client_table" >
@@ -87,7 +87,6 @@ tbody:before {line-height:1em; content:"\200C"; display:block;}
               <th style="border-radius: 0;">Birthday</th>
               <th style="border-radius: 0;">Age</th>
               <th style="border-radius: 0;">Height</th>
-              <th style="border-radius: 0;">Current Weight</th>
               <th style="border-radius: 0;">Target Weight</th>
               <th style="border-radius: 0;">Email</th>
               <th style="border-radius: 0;">Address</th>
@@ -106,7 +105,6 @@ tbody:before {line-height:1em; content:"\200C"; display:block;}
                       <td>{{field.birthday}}</td>
                       <td>{{field.age}}</td>
                       <td>{{field.height}}</td>
-                      <td>{{field.current_weight}}</td>
                       <td>{{field.target_weight}}</td>
                       <td>{{field.email}}</td>
                       <td>{{field.address}}</td>
@@ -130,8 +128,8 @@ tbody:before {line-height:1em; content:"\200C"; display:block;}
     
 
   {% if openmodal == 'add_patient_modal' %}
-
-<script>
-  $('#add_patient_modal').modal('show');
-</script>
-{% endif %}
+    <script>
+      $('#add_patient_modal').modal('show');
+    </script>
+  {% endif %}
+</body>

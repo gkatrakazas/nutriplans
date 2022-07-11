@@ -1,0 +1,128 @@
+<script>
+    window.onload = function updateequiv(){
+      
+  
+      var data = JSON.parse("{{equiv_data|escapejs}}");
+      console.log(data)
+      for (const [key, value] of Object.entries(data)) {
+        
+        target_calories = data[key].fields.target_calories;
+        carbohydrates_percent = data[key].fields.carbohydrates_percent;
+        proteins_percent= data[key].fields.proteins_percent;
+        fat_percent= data[key].fields.fat_percent;
+        full_milk_val= data[key].fields.full_milk;
+        semi_milk_val= data[key].fields.semi_milk;
+        zero_milk_val= data[key].fields.zero_milk;
+        fruits_val= data[key].fields.fruits;
+        vegetables_val= data[key].fields.vegetables;
+        bread_cereals_val= data[key].fields.bread_cereals;
+        full_meat_val= data[key].fields.full_meat;
+        semi_meat_val= data[key].fields.semi_meat;
+        zero_meat_val= data[key].fields.zero_meat;
+        fat_val= data[key].fields.fat;
+      }
+  
+      total_gr_carbohydrates_val=full_milk_val*12+semi_milk_val*12+zero_milk_val*12+fruits_val*15+vegetables_val*5+bread_cereals_val*15;
+      total_gr_proteins_val = full_milk_val*8+semi_milk_val*8+zero_milk_val*8+fruits_val*0+vegetables_val*2+bread_cereals_val*3+full_meat_val*7+semi_meat_val*7+zero_meat_val*7+fat_val*0;
+      total_gr_fat_val = full_milk_val*8+semi_milk_val*5+full_meat_val*8+semi_meat_val*5+zero_meat_val*3+fat_val*5;
+      
+      document.getElementById('total_gr_carbohydrates_cl').innerHTML = total_gr_carbohydrates_val;
+      document.getElementById('total_gr_proteins_cl').innerHTML = total_gr_proteins_val;
+      document.getElementById('total_gr_fat_cl').innerHTML = total_gr_fat_val;
+  
+      total_cal_carbohydrates_val = total_gr_carbohydrates_val*4;
+      total_cal_proteins_val = total_gr_proteins_val*4;
+      total_cal_fat_val = total_gr_fat_val*9;
+  
+      total_cal_val=total_cal_carbohydrates_val+total_cal_proteins_val+total_cal_fat_val;
+  
+      document.getElementById('total_cal_carbohydrates_cl').innerHTML = total_cal_carbohydrates_val;
+      document.getElementById('total_cal_proteins_cl').innerHTML = total_cal_proteins_val;
+      document.getElementById('total_cal_fat_cl').innerHTML = total_cal_fat_val;
+      document.getElementById('total_cal_cl').innerHTML = total_cal_val;
+  
+      total_per_carbohydrates_cl=((total_cal_carbohydrates_val/total_cal_val)*100).toFixed(2);
+      total_per_proteins_cl=((total_cal_proteins_val/total_cal_val)*100).toFixed(2);
+      total_per_fat_cl=((total_cal_fat_val/total_cal_val)*100).toFixed(2);
+      document.getElementById('total_per_carbohydrates_cl').innerHTML = total_per_carbohydrates_cl;
+      document.getElementById('total_per_proteins_cl').innerHTML =total_per_proteins_cl ;
+      document.getElementById('total_per_fat_cl').innerHTML = total_per_fat_cl;
+  
+    
+  
+    var ctx = document.getElementById("myChart1").getContext("2d");
+  
+    var data = {
+      labels: ["carbohydrates %", "Proteins %", "Fat %"],
+      datasets: [
+          {
+              label: "Target",
+              backgroundColor: "blue",
+              data: [total_per_carbohydrates_cl,total_per_proteins_cl,total_per_fat_cl]
+          },
+          {
+              label: "Target",
+              backgroundColor: "lightblue",
+              data: [carbohydrates_percent,proteins_percent,fat_percent]
+          },
+  
+      ]
+  };
+  
+    var myBarChart = new Chart(ctx, {
+      type: 'bar',
+      data: data,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+          barValueSpacing: 20,
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      min: 0,
+                      
+                  }
+              }]
+          }
+      }
+  });
+  
+  var ctx = document.getElementById("myChart2").getContext("2d");
+  
+  var data = {
+    labels: ["Calories"],
+    datasets: [
+        {
+            label: "Target",
+            backgroundColor: "blue",
+            data: [target_calories]
+        },
+        {
+            label: "Target",
+            backgroundColor: "lightblue",
+            data: [total_cal_val]
+        },
+  
+    ]
+  };
+  
+  var myBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                  min: 0,
+                    
+                }
+            }]
+        }
+    }
+  });
+  
+  }
+  
+  </script>

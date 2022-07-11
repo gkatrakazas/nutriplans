@@ -4,11 +4,6 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/client_info_table.css' %}"/>
   <link rel="stylesheet" type="text/css" href="{% static 'css/client_page.css' %}"/>
 
-  <!-- for chart -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
-
 </head>
 <style>
 
@@ -18,10 +13,9 @@
     min-height: 100%;
   display: grid;
   padding: 2%;
-  grid:
-    "column1 column2" 100%
-    / 30% 70%;
-  gap: 8px;
+  grid:"column1 column2" 100%
+    / 25% 75%;
+  gap: 18px;
 
   align-content: start;
   align-items: start;
@@ -41,10 +35,6 @@
     <div class="column1 ">
 
       <h3>Client Information</h3>
-        
-      {% if action_info == 'show' %}
-        <form method="post">
-          {% csrf_token %}
           <table style="overflow-x:auto; width:100%" id="client_info_table1">
             {% for field in target_client %}
             <input type="hidden" name="target_row" value="{{field.id}}" >
@@ -73,10 +63,6 @@
               <td id="id_height">{{ field.height }}</td>
             </tr>
             <tr>
-              <th>Current Weight</th>
-              <td>{{ field.current_weight }}</td>
-            </tr>
-            <tr>
               <th>Target Weight</th>
               <td>{{ field.target_weight }}</td>
             </tr>
@@ -91,47 +77,90 @@
             {% endfor %}
           </table>
           <div class="submit_buttons" style="float: right; margin-top:2%;">
-            <button class="btn btn-primary" style="background-color:coral; border-color:coral;" type="submit" name="action_button" value="edit_client_info"><i class="fa fa-edit"></i> Edit</button>
+            <button class="btn btn-primary" style="background-color:coral; border-color:coral;" type="submit" name="action_button" value="edit_client_info" data-toggle="modal" data-target="#edit_client_modal"><i class="fa fa-edit"></i> Edit</button>
           </div>
-        </form>
-        
-      {% elif action_info == 'edit' %}
-        <form method="post">
-          {% csrf_token %}
-          <table style="overflow-x:auto; width:100%" id="client_info_table2">
-            
-            {% for field in edit_client %}
-            <tr>
-              <th>{{ field.label}}</th>
-              <td>{{ field}}</td>
-              {% for error in field.errors %}
-                <p style="color: red">{{ error }}</p>
-              {% endfor %}
-            </tr>
-            {%  endfor %}
-          </table> 
-          <div class="submit_buttons" style="float: right; margin-top:2%;">
-            <button class="btn btn-danger"   type="submit" name="action_button" value="cancel_client_info"><i class=""></i> Cancel</button>
-            <button class="btn btn-primary"  type="submit" name="action_button" value="save_client_info"><i class="fa fa-save"></i> Save</button>
-          </div>
-        </form>
-      {% endif %}
-  
+      
     </div>
 
     <div class="column2">
 
-      <center>
-        <button type="button" class="btn btn-primary btn-lg" style="margin:3%; background-color: coral; border: 0;" data-toggle="modal" data-target="#add_measurements_modal"> <i class="fa fa-plus"></i> Add Measurment
-        </button>
-      </center>
+        <h3>Equivalents</h3>
+           <div class="row col-xs-6 col-md-12" style="margin-bottom:2%;">
+            <div class="col-eqiv" style="width: 40%;">
+              <table style="width:100%;">
+            <tr>
+              {% for field in client_equiv %}
+              <tr>
+                <th style="width: 12%;padding: 8px;"></th>
+                <th style="width: 22%;padding: 8px;">Carbohydrates</th>
+                <th style="width: 22%;padding: 8px;">Proteins</th>
+                <th style="width: 22%;padding: 8px;">Fat</th>
+                <th style="width: 22%;padding: 8px;">Calories</th>
+              </tr>
+              <tr>
+                <th style="padding: 8px;">Targets</th>
+                <td style="background-color: white;">{{field.carbohydrates_percent}} %</td>
+                <td style="background-color: white;">{{field.proteins_percent}} %</td>
+                <td style="background-color: white;">{{field.fat_percent}} %</td>
+                <td style="background-color: white;">{{field.target_calories}} cal</td>
+              </tr>
+            
+              <tr style="background-color: rgb(255, 230, 220);">
+                <th style="padding: 8px;">Total (Gr)</th>
+                <td id="total_gr_carbohydrates_cl"></td>
+                <td  id="total_gr_proteins_cl"></td>
+                <td  id="total_gr_fat_cl"></td>
+                <td></td>
+              </tr>
+              <tr style="background-color: rgb(255, 176, 145);">
+                <th style="padding: 8px;">Total (Cal)</th>
 
-      {% include "./add_measurements_modal.html" %}
-        
-      <div class="tableWrap">
+                <td id="total_cal_carbohydrates_cl"></td>
+                <td id="total_cal_proteins_cl"></td>
+                <td id="total_cal_fat_cl"></td>
+                <td id="total_cal_cl"></td>
+              </tr>
+              <tr style="background-color: rgb(255, 230, 220);">
+                <th style="padding:8px;">Percent (%)</th>
+                <td  id="total_per_carbohydrates_cl"></td>
+                <td id="total_per_proteins_cl"></td>
+                <td id="total_per_fat_cl"></td>
+                <td></td>
+              </tr>
+            
+              {% endfor %}
+            
+            </tr>
+              </table>
+              <div class="submit_buttons" style="float: right; margin-top:2%;">
+                <button type="button" class="btn btn-primary btn-md" style=" background-color: coral; border: 0;" data-toggle="modal" data-target="#edit_equivalents_modal" onclick="updateequiv();"> <i class="fa fa-edit"></i> Edit Equivalents
+                </button>            
+              </div>
+            </div>
+            <div class="col-eqiv" style=" width: 45%;">
+              <canvas id="myChart1" style="width:100%;" ></canvas>
+
+            </div>
+            <div class="col-eqiv" style=" width: 15%;">
+              <canvas id="myChart2"></canvas>
+
+            </div>
+
+        </div>
+       
+
+
+      {% include "./modal_templates/add_measurements_modal.html" %}
+      {% include "./modal_templates/edit_measurements_modal.html" %}
+      {% include "./modal_templates/edit_equivalents_modal.html" %}
+
+      <div style="margin-bottom:2%;">
+        <h3>Measurements</h3>
+        <div class="tableWrap">
         <table class="table center" id="measurements_table" >
           <thead>
             <th>Date</th>
+            <th>Activity Factor</th>
             <th>Weight</th>
             <th>Fat</th>
             <th>Muscle mass</th>
@@ -151,7 +180,9 @@
                 <tr>
                   <form method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="target_row" value="{{field.id}}" >
                     <td>{{field.date}}</td>
+                    <td>{{field.activity_factor}}</td>
                     <td>{{field.weight}}</td>
                     <td>{{field.fat}}</td>
                     <td>{{field.muscle_mass}}</td>
@@ -162,161 +193,64 @@
                     <td id="bmi_{{field.id}}"></td>
                     <td id="ib_{{field.id}}" ></td>
 
-                    <td> <button type="submit" style="background-color: transparent;" id="save_button" name="action_button" value="view_button"><i class='fa fa-edit'></i></button> </td>
-                    <td> <button type="submit" style="background-color: transparent;"><i class='fa fa-trash'></i></button> </td>
+                    <td> <button type="submit" style="background-color: transparent;" name="action_button" value="edit_measurements_button"><i class='fa fa-edit'></i></button> </td>
+                    <td> <button type="submit" style="background-color: transparent;" name="action_button" value="delete_client_button"><i class='fa fa-trash'></i></button> </td>
                   </form>
                 </tr>
               {% endfor %}   
           </tr>
           </tbody>
         </table>
+        
+        
         </div>
+        <div class="submit_buttons" style="float: right;margin-bottom:2%;">
+          <button type="button" class="btn btn-primary btn-md" style="margin:3%;width: 100%; background-color: coral; border: 0;" data-toggle="modal" data-target="#add_measurements_modal"> <i class="fa fa-plus"></i> Add Measurment
+          </button>
+        </div>
+      </div>
+      <h3>Diagrams</h3>
+      <div class="row col-xs-6 col-md-12">
 
-        <canvas id="myChart" style="width:100%;"></canvas>
+        <div class="col-chart" style="width:50%;">
+          <canvas id="myChartweight" style="width:100%;"></canvas>
+        </div>
+        <div class="col-chart" style="width:50%;">
+          <canvas id="myChart" style="width:100%;"></canvas>
+        </div>
+      </div>
     </div>
     
   </section>
 
+  {% include "./help_templates/extra_calculations.html" %}  
+  {% include "./help_templates/chart_mesurements.html" %}
+  {% include "./help_templates/updateequiv.html" %}
+  {% include "./modal_templates/edit_client_modal.html" %}
 
-<script>
-  window.onload = function afterWebPageLoad(){
-    let gender = document.getElementById("id_gender").innerText; 
-    let age = document.getElementById("id_age").innerText; 
-    let height = document.getElementById("id_height").innerText;
-    let weight=-1;
+  
 
-    let bmr=-1;
-    let ib=-1;
-    let bmi=-1;
-    
+  updateequiv
 
-    var data = JSON.parse("{{data|escapejs}}");
-      for (const [key, value] of Object.entries(data)) {
-        console.log('--->',key, data[key].pk);
-        
-        weight = data[key].fields.weight;
-        
-        if (gender == 'Male'){
-          
+  {% if openmodal == 'add_measurements_modal' %}
+  <script>
+    $('#add_measurements_modal').modal('show');
+  </script>
+  {% endif %}
+  {% if openmodal == 'edit_measurements_modal' %}
+  <script>
+    $('#edit_measurements_modal').modal('show');
+  </script>
+  {% endif %}
+  {% if openmodal == 'edit_client_modal' %}
+  <script>
+    $('#edit_client_modal').modal('show');
+  </script>
+  {% endif %}
+</body>
 
-          bmr = weight*13.75+66.5+height*5-6.78*age;
-          ib= (height*height)*22.7/10000;
 
-        } else if (gender == 'Female'){
 
-          bmr=655+9.56*weight+1.85*height-4.68*age;
-          ib= (height*height)*22.4/10000;   
 
-        }
-        bmi = (weight/(height*height))*10000;
-        document.getElementById('bmr_'+data[key].pk).innerText = bmr.toFixed(2);
-        document.getElementById('bmi_'+data[key].pk).innerText = bmi.toFixed(2);    
-        document.getElementById('ib_'+data[key].pk).innerText = ib.toFixed(2);
-        
-      }
-  }
-</script>
-    
-    <script>
-
-      var dict = []; // create an empty array
-
-      var data = JSON.parse("{{data|escapejs}}");
-      for (const [key, value] of Object.entries(data)) {
-        console.log(key, data[key].fields.date);
-        dict.push({
-            date:   data[key].fields.date,
-            weight: data[key].fields.weight,
-            fat: data[key].fields.fat,
-            muscle_mass	: data[key].fields.muscle_mass,
-            bone_mass: data[key].fields.bone_mass,
-            liguids: data[key].fields.liguids,
-            vinceral_fat: data[key].fields.vinceral_fat
-            });
-      }
-      
-      const date = []
-      const val_weight = []
-      const val_fat = []
-      const val_muscle_mass = []
-      const val_bone_mass = []
-      const val_liguids = []
-      const val_vinceral_fat = []
-
-      for (i in dict){
-
-        date.push(dict[i].date)
-        val_weight.push(dict[i].weight)
-        val_fat.push(dict[i].fat)
-        val_muscle_mass.push(dict[i].muscle_mass)
-        val_bone_mass.push(dict[i].bone_mass)
-        val_liguids.push(dict[i].liguids)
-        val_vinceral_fat.push(dict[i].vinceral_fat)
-      }
-
-      
-      var ctx = document.getElementById("myChart");
-      var lineChart = new Chart(ctx, {
-        type: 'line',
-    data: {
-        labels: date,
-        datasets: [
-        {
-          label: 'Weight',
-          borderColor: 'rgb(0,0,0)',
-          data: val_weight,
-        
-        },{
-        
-          label: 'Fat',
-          borderColor: 'rgb(0,0,255)',
-          data: val_fat,
-        },{
-        
-          label: 'Muscle mass',
-          borderColor: 'rgb(255,255,0)',
-          data: val_muscle_mass,
-        },{
-          
-          label: 'Bone Mass',
-          borderColor: 'rgb(128,128,128)',
-          data: val_bone_mass,
-        },{
-          
-          label: 'Liguids',
-          borderColor: 'rgb(255,0,255)',
-          data: val_liguids,
-        },{
-          
-          label: 'Vinceral Fat',
-          borderColor: 'rgb(0,255,255)',
-          data: val_vinceral_fat,
-        },
-      
-      
-      ],
-
-    },
-    options: {
-
-    scales: {
-      x: {
-        // The axis for this scale is determined from the first letter of the id as `'x'`
-        // It is recommended to specify `position` and / or `axis` explicitly.
-        type: 'time',
-        time: {
-          parser: 'YYYY-MM-DD',
-          unit: 'week',
-          displayFormats: {
-             month: 'DD/MM/YY'
-          },
-          tooltipFormat: 'DD/MM/YY'
-        },
-        
-      }
-          }
-    }
-});
-      </script>
 
   

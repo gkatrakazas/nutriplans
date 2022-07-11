@@ -83,8 +83,8 @@
                   <li class="nav-item">
                     <a class="nav-link btn text-black" style="background-color: white;" type="button" data-toggle="modal" data-target="#signin_modal">Sign in</a>
 
-                      {% include "./sign.html" %}
-                      {% include "./signup.html" %}
+                      {% include "./modal_templates/sign.html" %}
+                      {% include "./modal_templates/signup.html" %}
                   </li>
                   {% endif %}
                 
@@ -94,14 +94,13 @@
           </div>
       </nav> 
     </div>
-    {% include "./alert.html" %}
+    {% include "./help_templates/alert.html" %}
     {% endblock content %}  
   </body>  
 </html>  
 
 
 {% if openmodal == 'singin_modal' %}
-
 <script>
   $('#signin_modal').modal('show');
 </script>

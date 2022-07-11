@@ -1,0 +1,143 @@
+<head>
+      <!-- for chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
+</head>
+
+<script>
+
+    var dict = []; // create an empty array
+
+    var data = JSON.parse("{{data|escapejs}}");
+
+    for (const [key, value] of Object.entries(data)) {
+      console.log(key, data[key].fields.date);
+      dict.push({
+          date:   data[key].fields.date,
+          weight: data[key].fields.weight,
+          fat: data[key].fields.fat,
+          muscle_mass	: data[key].fields.muscle_mass,
+          bone_mass: data[key].fields.bone_mass,
+          liguids: data[key].fields.liguids,
+          vinceral_fat: data[key].fields.vinceral_fat
+          });
+    }
+    
+    const date = []
+    const val_weight = []
+    const val_fat = []
+    const val_muscle_mass = []
+    const val_bone_mass = []
+    const val_liguids = []
+    const val_vinceral_fat = []
+
+    for (i in dict){
+      
+      date.push(dict[i].date)
+      val_weight.push(dict[i].weight)
+      val_fat.push(dict[i].fat)
+      val_muscle_mass.push(dict[i].muscle_mass)
+      val_bone_mass.push(dict[i].bone_mass)
+      val_liguids.push(dict[i].liguids)
+      val_vinceral_fat.push(dict[i].vinceral_fat)
+    }
+
+    var ctx = document.getElementById("myChartweight");
+    var lineChart = new Chart(ctx, {
+      type: 'line',
+  data: {
+      labels: date,
+      datasets: [
+      {
+        label: 'Weight',
+        borderColor: 'rgb(0,0,0)',
+        data: val_weight,
+      
+      },
+    
+    ],
+
+  },
+  options: {
+
+  scales: {
+    x: {
+      // The axis for this scale is determined from the first letter of the id as `'x'`
+      // It is recommended to specify `position` and / or `axis` explicitly.
+      type: 'time',
+      time: {
+        parser: 'YYYY-MM-DD',
+        unit: 'week',
+        displayFormats: {
+           month: 'DD/MM/YY'
+        },
+        tooltipFormat: 'DD/MM/YY'
+      },
+      
+    }
+        }
+  }
+});
+
+
+var ctx = document.getElementById("myChart");
+    var lineChart = new Chart(ctx, {
+      type: 'line',
+  data: {
+      labels: date,
+      datasets: [
+      {
+      
+        label: 'Fat',
+        borderColor: 'rgb(0,0,255)',
+        data: val_fat,
+      },{
+      
+        label: 'Muscle mass',
+        borderColor: 'rgb(255,255,0)',
+        data: val_muscle_mass,
+      },{
+        
+        label: 'Bone Mass',
+        borderColor: 'rgb(128,128,128)',
+        data: val_bone_mass,
+      },{
+        
+        label: 'Liguids',
+        borderColor: 'rgb(255,0,255)',
+        data: val_liguids,
+      },{
+        
+        label: 'Vinceral Fat',
+        borderColor: 'rgb(0,255,255)',
+        data: val_vinceral_fat,
+      },
+    
+    
+    ],
+
+  },
+  options: {
+
+  scales: {
+    x: {
+      // The axis for this scale is determined from the first letter of the id as `'x'`
+      // It is recommended to specify `position` and / or `axis` explicitly.
+      type: 'time',
+      time: {
+        parser: 'YYYY-MM-DD',
+        unit: 'week',
+        displayFormats: {
+           month: 'DD/MM/YY'
+        },
+        tooltipFormat: 'DD/MM/YY'
+      },
+      
+    }
+        }
+  }
+});
+
+
+</script>

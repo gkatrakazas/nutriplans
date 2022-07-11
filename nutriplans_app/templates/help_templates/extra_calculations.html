@@ -1,0 +1,38 @@
+<script>
+      let gender = document.getElementById("id_gender").innerText; 
+      let age = document.getElementById("id_age").innerText; 
+      let height = document.getElementById("id_height").innerText;
+      let weight=-1;
+  
+      let bmr=-1;
+      let ib=-1;
+      let bmi=-1;
+      
+  
+      var data = JSON.parse("{{data|escapejs}}");
+        for (const [key, value] of Object.entries(data)) {
+          console.log('--->',key, data[key].pk);
+          
+          weight = data[key].fields.weight;
+          
+          if (gender == 'Male'){
+            
+  
+            bmr = weight*13.75+66.5+height*5-6.78*age;
+            ib= (height*height)*22.7/10000;
+  
+          } else if (gender == 'Female'){
+  
+            bmr=655+9.56*weight+1.85*height-4.68*age;
+            ib= (height*height)*22.4/10000;   
+  
+          }
+          bmi = (weight/(height*height))*10000;
+          document.getElementById('bmr_'+data[key].pk).innerText = bmr.toFixed(2);
+          document.getElementById('bmi_'+data[key].pk).innerText = bmi.toFixed(2);    
+          document.getElementById('ib_'+data[key].pk).innerText = ib.toFixed(2);
+          
+        }
+    
+  </script>
+    

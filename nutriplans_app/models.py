@@ -21,7 +21,7 @@ class Choice(models.Model):
 
 from six import text_type
 
-class Patients(models.Model):
+class Clients(models.Model):
     status_choices = (
         ('Active', 'Active'),
         ('Active', 'Inactive'),
@@ -32,14 +32,13 @@ class Patients(models.Model):
     )
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(verbose_name='Name',default='',max_length=32)
+    name = models.CharField(default='',max_length=32)
     status = models.CharField(max_length=7,choices=status_choices)
     gender= models.CharField(max_length=7,choices=gender_choices)
     birthday = models.CharField(default='',max_length=100)
     age = models.IntegerField(default=0)
     height = models.IntegerField(default=0)
-    current_weight = models.IntegerField(default=0)
-    target_weight = models.IntegerField(default=0)
+    target_weight = models.IntegerField(default=0.0)
     email = models.EmailField(default='')
     phone = models.IntegerField(default=0)
     address = models.CharField(default='',max_length=100)
@@ -50,8 +49,9 @@ class Patients(models.Model):
 
 
 class Measurements(models.Model):
-    patient = models.ForeignKey(Patients, on_delete=models.CASCADE)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
     date = models.CharField(default='',max_length=100)
+    activity_factor = models.FloatField(default=1.0)
     weight = models.FloatField(default=0.0)
     fat= models.FloatField(default=0.0)
     muscle_mass = models.FloatField(default=0.0)
@@ -64,3 +64,24 @@ class Measurements(models.Model):
         return self.patient
 
 
+
+
+class Equivalents(models.Model):
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    target_calories = models.FloatField(default=0.0)
+    carbohydrates_percent = models.IntegerField(default=40)
+    proteins_percent= models.IntegerField(default=30)
+    fat_percent= models.IntegerField(default=30)
+    full_milk = models.IntegerField(default=0)
+    semi_milk = models.IntegerField(default=0)
+    zero_milk = models.IntegerField(default=0)
+    fruits = models.IntegerField(default=0)
+    vegetables = models.IntegerField(default=0)
+    bread_cereals = models.IntegerField(default=0)
+    full_meat = models.IntegerField(default=0)
+    semi_meat = models.IntegerField(default=0)
+    zero_meat = models.IntegerField(default=0)
+    fat = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.client
