@@ -1,0 +1,105 @@
+<head>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/workspace_table.css' %}"/>
+
+</head>
+<style>
+
+.layout {
+  width: 100%;
+  min-height: 95%;
+  background-color: rgba(255, 127, 80, 0.2);
+
+  display: grid;
+  grid:
+    "column1 column2" 1fr
+    / 70% 30%;
+  gap: 8px;
+
+  justify-content: space-around;
+  align-content: start;
+  justify-items: center;
+  align-items: center;
+}
+
+.column1 { grid-area: column1; }
+.column2 { grid-area: column2; }
+</style>
+
+
+
+<body>
+  <nav>
+      {% include "./base.html" %}
+  </nav>
+  <section class="layout">
+
+    <div class="column1">
+      <table>
+        <tr>
+          <th></th>
+          <th>Breakfast</th>
+          <th>Morning Snack</th>
+        </tr>
+
+        <tr>
+          <th>Monday</th>
+          <td>  <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="thursday_breakfast" cols="30" rows="10"></textarea></td>
+          <td id="thursday_morningsnack"></td>
+        </tr>
+
+        <tr>
+          <th>Monday</th>
+        </tr>
+
+      </table>
+
+      <script>
+         function dragStart(event) {
+          
+            event.dataTransfer.setData("Text", event.target.id);
+         }
+
+         function dropNow(event) {
+            event.preventDefault();
+         }
+         function drop(event) {
+            event.preventDefault();
+            var data = event.dataTransfer.getData("Text");
+            alert(data)
+            document.getElementById(event.target.id).value = document.getElementById(event.target.id).value+document.getElementById(data).innerHTML +'\n';
+
+         }
+      </script>
+    </div>
+    <div class="column2">
+      <table>
+        <tr>
+          <th>Meals templates</th>
+        </tr>
+        <tr>
+          <td ondragstart = "dragStart(event)"
+          draggable = "true" id="meal_1">test1</td>
+        </tr>
+        <tr>
+          <td>test2</td>
+        </tr>
+        <tr>
+          <td>test3</td>
+        </tr>
+        <tr>
+          <td>test4</td>
+        </tr>
+        <tr>
+          <td>test5</td>
+        </tr>
+        <tr>
+          <td>test6</td>
+        </tr>
+      </table>
+      
+    </div>
+      
+  </section>
+
+</body>

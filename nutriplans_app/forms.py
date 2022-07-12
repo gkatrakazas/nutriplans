@@ -159,3 +159,4 @@ class EditEquivalents(forms.Form):
     class Meta:
         model = Equivalents
         fields = ('target_calories','carbohydrates_percent','proteins_percent','fat_percent', 'full_milk', 'semi_milk','zero_milk','fruits','vegetables','bread_cereals','full_meat','semi_meat','zero_meat','fat')
+

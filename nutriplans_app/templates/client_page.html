@@ -79,6 +79,13 @@
           <div class="submit_buttons" style="float: right; margin-top:2%;">
             <button class="btn btn-primary" style="background-color:coral; border-color:coral;" type="submit" name="action_button" value="edit_client_info" data-toggle="modal" data-target="#edit_client_modal"><i class="fa fa-edit"></i> Edit</button>
           </div>
+          <h3>Create plan</h3>
+          <div class="submit_buttons" style="float: left; margin-top:2%;">
+            <form method="post">
+              {% csrf_token %}
+              <button class="btn btn-primary" style="background-color:coral; border-color:coral;" type="submit" name="action_button" value="create_plan"><i class="fa fa-building"></i> Create Plan</button>
+            </form>
+          </div>
       
     </div>
 

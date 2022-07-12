@@ -202,6 +202,12 @@ def client_page(request,client_id):
     equiv_data = serializers.serialize("json",Equivalents.objects.all().filter(client_id=client_id))
 
     if request.method == 'POST':
+        
+        if request.POST.get('action_button')=='create_plan':
+            #action="{% url 'client_page' field.user_id field.id %}"
+            print ('redirect to create plan')
+            return redirect('create_plan',client_id=client_id)
+
         if request.POST.get('action_button')=='edit_client_info':
             print('edit time')
                     
@@ -399,4 +405,15 @@ def client_page(request,client_id):
 
 
     return render(request, 'client_page.html',{'target_client':target_client,'edit_client':edit_client,'client_measurements':client_measurements,'add_measurment_form':add_measurment_form,'data':data,'client_equiv':client_equiv,'edit_equiv':edit_equiv,'equiv_data':equiv_data})
+
+
+@group_required('Nutrition')
+def create_plan(request,client_id):
+
+    print ('client_page')
+    login_user_id=request.user.id
+    print('id= ',client_id)
+    target_client_id=client_id
+
+    return render(request, 'create_plan.html')
 
