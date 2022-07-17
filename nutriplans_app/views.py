@@ -1,6 +1,7 @@
+from functools import wraps
 from pyexpat.errors import messages
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from grpc import Status
 from numpy import block
 from nutriplans_app.forms import CustomUserCreationForm ,AddClients
@@ -10,7 +11,7 @@ from django.contrib import auth
 from .forms import AddMeasurements, EditEquivalents, SignUpForm
 from django.contrib import messages
 from .models import Clients,Measurements,Equivalents
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import Group
 from django.core import serializers
 
@@ -25,6 +26,14 @@ def group_required(*group_names):
 
     return user_passes_test(in_groups, login_url='403')
 
+def has_client(view):
+    @wraps(view)
+    def inner(request, client_id, *args, **kwargs):
+        client = Clients.objects.all().filter(id=client_id)
+        if client[0].user.id != request.user.id:
+            return HttpResponseForbidden()
+        return view(request, client_id, *args, **kwargs)
+    return inner
 
 def index(request):
     print(request.user)
@@ -96,6 +105,7 @@ def signup(request):
 
 
 @group_required('Nutrition')
+@login_required(login_url='signin')
 def workspace(request):
     if request.user.is_authenticated:
 
@@ -178,7 +188,9 @@ def workspace(request):
 
 
 @group_required('Nutrition')
-def client_page(request,client_id):
+@login_required(login_url='signin')
+@has_client
+def client_page(request, client_id):
 
     login_user_id=request.user.id
     print('id= ',client_id)
@@ -193,6 +205,7 @@ def client_page(request,client_id):
 
 
     client_equiv= Equivalents.objects.all().filter(client_id=client_id)
+    print(client_id)
     edit_equiv=EditEquivalents(initial={'target_calories':client_equiv[0].target_calories,'carbohydrates_percent':client_equiv[0].carbohydrates_percent,'proteins_percent':client_equiv[0].proteins_percent,'fat_percent':client_equiv[0].fat_percent,'full_milk':client_equiv[0].full_milk,'semi_milk':client_equiv[0].semi_milk,'zero_milk':client_equiv[0].zero_milk,'fruits':client_equiv[0].fruits,'vegetables':client_equiv[0].vegetables,'bread_cereals':client_equiv[0].bread_cereals,'full_meat':client_equiv[0].full_meat,'semi_meat':client_equiv[0].semi_meat,'zero_meat':client_equiv[0].zero_meat,'fat':client_equiv[0].fat})
 
     # client data id user whant to edit
