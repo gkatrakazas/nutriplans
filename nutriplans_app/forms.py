@@ -92,16 +92,18 @@ class AddClients(forms.Form):
         ('Female', 'Female'),
     )
     
-    name = forms.CharField(label="Name", required=True,max_length=32,widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'full name'}))
-    status = forms.ChoiceField(label="Status", required=True,choices=status_choices,widget=forms.Select(attrs={'class':'form-control'}))
-    gender= forms.ChoiceField(label="Gender", required=True,choices=gender_choices,widget=forms.Select(attrs={'class':'form-control'}))
-    birthday = forms.DateField(label="Birthday", required=True,widget=forms.DateInput(attrs={'type': 'date','class':'form-control','onchange' : "find_age();"}))
-    age = forms.IntegerField(label="Age",required=True,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'age auto fill by birthday date'}))
-    height = forms.IntegerField(label="Height",required=True,validators=[MaxValueValidator(300),MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'height in cm'}))
-    target_weight = forms.FloatField(label="Target Weight",required=True,validators=[MaxValueValidator(500.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'target weight'}))
-    email = forms.EmailField(label="Email", required=True,widget=forms.EmailInput(attrs={'class': 'form-control','placeholder': 'email'}), max_length=64)
-    phone = forms.IntegerField(label="Phone Number", required=False,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'phone number (optional)'}))
-    address = forms.CharField(label="Adress", required=False, max_length=100,widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'address (optional)'}))
+    name = forms.CharField(label="Name", required=True,max_length=32,widget=forms.TextInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','onkeyup' : "validate_then_submit();",'placeholder': 'full name'}))
+    status = forms.ChoiceField(label="Status", required=True,choices=status_choices,widget=forms.Select(attrs={'class':'form-control','onChange':'validate_then_submit()','onkeyup' : "validate_then_submit();"}))
+    gender= forms.ChoiceField(label="Gender", required=True,choices=gender_choices,widget=forms.Select(attrs={'class':'form-control','onChange':'validate_then_submit()','onkeyup' : "validate_then_submit();"}))
+    birthday = forms.DateField(label="Birthday", required=True,widget=forms.DateInput(attrs={'type': 'date','class':'form-control','onchange' : "find_age();" "validate_then_submit()",'onkeyup' :"find_age();" "validate_then_submit();"}))
+    age = forms.IntegerField(label="Age",required=True,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder': 'age auto fill by birthday date','onChange':'validate_then_submit()'}))
+    height = forms.IntegerField(label="Height",required=True,validators=[MaxValueValidator(300),MinValueValidator(0)],widget=forms.NumberInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'height in cm'}))
+    initial_weight = forms.FloatField(label="Initial Weight",required=True,validators=[MaxValueValidator(500.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'initial weight'}))
+    target_weight = forms.FloatField(label="Target Weight",required=True,validators=[MaxValueValidator(500.0),MinValueValidator(0.0)],widget=forms.NumberInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'target weight'}))
+    email = forms.EmailField(label="Email", required=True,widget=forms.EmailInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'email'}), max_length=64)
+    phone = forms.IntegerField(label="Phone Number", required=False,widget=forms.NumberInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'phone number (optional)'}))
+    address = forms.CharField(label="Adress", required=False, max_length=100,widget=forms.TextInput(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'address (optional)'}))
+    notes = forms.CharField(label="Notes", required=False, max_length=500,widget=forms.Textarea(attrs={'class': 'form-control','onChange':'validate_then_submit()','placeholder': 'notes (optional)'}))
     
     def __str__(self):
             return self.name

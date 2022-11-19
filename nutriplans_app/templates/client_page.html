@@ -13,7 +13,10 @@
     min-height: 100%;
   display: grid;
   padding: 2%;
-  grid:"column1 column2" 100%
+  grid:
+  "header header header" auto
+    ". body ." 100%
+    "column1 column2" 100%
     / 25% 75%;
   gap: 18px;
 
@@ -32,6 +35,9 @@
   </nav>
 
   <section class="layout"> 
+    <div class="header">
+      {% include "./client_base.html" %}
+    </div>
     <div class="column1 ">
 
       <h3>Client Information</h3>

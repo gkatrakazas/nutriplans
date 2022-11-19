@@ -38,10 +38,12 @@ class Clients(models.Model):
     birthday = models.CharField(default='',max_length=100)
     age = models.IntegerField(default=0)
     height = models.IntegerField(default=0)
+    initial_weight = models.IntegerField(default=0)
     target_weight = models.IntegerField(default=0.0)
     email = models.EmailField(default='')
     phone = models.IntegerField(default=0)
     address = models.CharField(default='',max_length=100)
+    notes = models.CharField(default='',max_length=1000)
 
     def __str__(self):
         return self.name
@@ -61,7 +63,7 @@ class Measurements(models.Model):
 
 
     def __str__(self):
-        return self.patient
+        return self.date
 
 
 

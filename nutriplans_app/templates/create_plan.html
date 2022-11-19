@@ -13,7 +13,7 @@
   display: grid;
   grid:
     "column1 column2" 1fr
-    / 70% 30%;
+    / 80% 20%;
   gap: 8px;
 
   justify-content: space-around;
@@ -39,38 +39,28 @@
         <tr>
           <th></th>
           <th>Breakfast</th>
-          <th>Morning Snack</th>
+          <th>Mor. Snack</th>
+          <th>Lunch</th>
+          <th>Aft. Snack</th>
+          <th>Dinner</th>
         </tr>
 
         <tr>
           <th>Monday</th>
-          <td>  <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="thursday_breakfast" cols="30" rows="10"></textarea></td>
-          <td id="thursday_morningsnack"></td>
+          <td> <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="monday_breakfast" resize: both;  ></textarea></td>
+          <td> <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="monday_morsnack"  resize: both;  ></textarea> </td>
+          <td> <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="monday_lunch"     resize: both;  ></textarea> </td>
+          <td> <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="monday_aftsnack"  resize: both;  ></textarea> </td>
+          <td> <textarea ondrop="drop(event)" ondragover = "dropNow(event)" id="monday_dinner"    resize: both;  ></textarea> </td>
+
         </tr>
 
         <tr>
-          <th>Monday</th>
+          <th>Thusday</th>
         </tr>
 
       </table>
 
-      <script>
-         function dragStart(event) {
-          
-            event.dataTransfer.setData("Text", event.target.id);
-         }
-
-         function dropNow(event) {
-            event.preventDefault();
-         }
-         function drop(event) {
-            event.preventDefault();
-            var data = event.dataTransfer.getData("Text");
-            alert(data)
-            document.getElementById(event.target.id).value = document.getElementById(event.target.id).value+document.getElementById(data).innerHTML +'\n';
-
-         }
-      </script>
     </div>
     <div class="column2">
       <table>
@@ -79,23 +69,22 @@
         </tr>
         <tr>
           <td ondragstart = "dragStart(event)"
-          draggable = "true" id="meal_1">test1</td>
+          draggable = "true" id="meal_1">Porridge: ποτήρι γάλα (240 ml), 3 κουτ. σούπας βρώμη (30 γρ), 1 μπανάνα μικρή, κανέλα (αν είναι αρεστή) και 2 κουτ. γλυκού κακάο
+          </td>
         </tr>
         <tr>
-          <td>test2</td>
+          <td ondragstart = "dragStart(event)"
+          draggable = "true" id="meal_2">1 ποτήρι γάλα (240 ml)</td>
         </tr>
         <tr>
-          <td>test3</td>
+          <td ondragstart = "dragStart(event)"
+          draggable = "true" id="meal_3">2 ρυζογκοφρέτες/καλαμπογκοφρέτες με 30 γρ τυρί cottage ή 1 φέτα κίτρινο τυρί</td>
         </tr>
         <tr>
-          <td>test4</td>
+          <td ondragstart = "dragStart(event)"
+          draggable = "true" id="meal_4">1 φρούτο εποχής</td>
         </tr>
-        <tr>
-          <td>test5</td>
-        </tr>
-        <tr>
-          <td>test6</td>
-        </tr>
+        
       </table>
       
     </div>
@@ -103,3 +92,21 @@
   </section>
 
 </body>
+
+<script>
+  function dragStart(event) {
+   
+     event.dataTransfer.setData("Text", event.target.id);
+  }
+
+  function dropNow(event) {
+     event.preventDefault();
+  }
+  function drop(event) {
+     event.preventDefault();
+     var data = event.dataTransfer.getData("Text");
+     alert(data)
+     document.getElementById(event.target.id).value = document.getElementById(event.target.id).value+document.getElementById(data).innerHTML;
+
+  }
+</script>

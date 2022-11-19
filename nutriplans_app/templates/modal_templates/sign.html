@@ -1,6 +1,12 @@
 <head>
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    input[type="username"].form-control {
 
+background-color : white!important; 
+
+}
+  </style>
 </head>
 <div class="modal fade" id="signin_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
   aria-hidden="true">
@@ -27,7 +33,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                  </div>
-                <input class="form-control" name="username" id="username" placeholder="username" type="text">
+                <input class="form-control" style="background-color: white;" name="username" id="username" placeholder="username" type="text">
             </div> <!-- input-group.// -->
           </div> <!-- form-group// -->
           <div class="form-group">
@@ -39,7 +45,7 @@
           </div> <!-- input-group.// -->
           </div> <!-- form-group// -->
           <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" class="btn btn-primary btn-block" style="background-color: coral;">Login</button>
           </div> <!-- form-group// -->
           <p class="text-center"><a href="#" class="btn">Forgot password?</a></p>
         </form>
