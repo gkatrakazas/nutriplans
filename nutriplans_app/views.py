@@ -4,7 +4,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from grpc import Status
 from numpy import block
-from nutriplans_app.forms import CustomUserCreationForm ,AddClients
+from nutriplans_app.forms import AddClients
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
 from django.contrib import auth
@@ -14,7 +14,13 @@ from .models import Clients,Measurements,Equivalents
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import Group
 from django.core import serializers
-
+from django.conf import settings
+from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string 
+from django.core.mail import EmailMultiAlternatives
+from email.mime.image import MIMEImage
+import os 
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
@@ -72,7 +78,7 @@ def logout(request):
         
 # Create your views here.
 
-
+@csrf_exempt
 def signup(request):
     print('try signup')
     if request.method == 'POST':
@@ -93,6 +99,27 @@ def signup(request):
 
             login(request, user)
  
+
+            subject = 'welcome to GFG world'
+            message = f'Hi {user.username}, thank you for registering in geeksforgeeks.'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [user.email, ]
+
+            # import html message.html file
+            html_template = 'email_templates/singup_email.html'
+            html_body = render_to_string(html_template, { 'username': user.username, })
+
+            
+            mail = EmailMultiAlternatives(
+                subject, 'welcome to Nutritionist Plans', email_from, recipient_list)
+            mail.attach_alternative(html_body, "text/html")
+
+
+            try:
+                mail.send()
+            except:
+                print(subject, message, email_from, recipient_list)
+                print('ERROR not send email')
             # redirect user to home page
             return render(request, 'workspace.html',{'form': form})  
         else:
@@ -157,7 +184,7 @@ def workspace(request):
                 #action="{% url 'client_page' field.user_id field.id %}"
                 print ('redirect')
                 target_client_id=request.POST['target_row']
-                return redirect('client_page',client_id=target_client_id)
+                return redirect('client_page_new',client_id=target_client_id)
 
             if request.POST.get('action_button')=='delete_client':
                 
@@ -429,4 +456,70 @@ def create_plan(request,client_id):
     target_client_id=client_id
 
     return render(request, 'create_plan.html')
+
+
+@group_required('Nutrition')
+def client_page_new(request,client_id):
+
+    login_user_id=request.user.id
+    print('id= ',client_id)
+    target_client_id=client_id
+
+    #get info client
+    target_client = Clients.objects.all().filter(id=target_client_id)
+    edit_client=AddClients(initial={'name':target_client[0].name,'status':target_client[0].status,'gender':target_client[0].gender,'birthday':target_client[0].birthday,'age':target_client[0].age,'height':target_client[0].height,'target_weight':target_client[0].target_weight,'email':target_client[0].email,'phone':target_client[0].phone,'address':target_client[0].address})
+
+    client_measurements = Measurements.objects.all().order_by('-date').filter(client_id=target_client_id)
+    add_measurment_form = AddMeasurements()
+
+
+    client_equiv= Equivalents.objects.all().filter(client_id=client_id)
+    edit_equiv=EditEquivalents(initial={'target_calories':client_equiv[0].target_calories,'carbohydrates_percent':client_equiv[0].carbohydrates_percent,'proteins_percent':client_equiv[0].proteins_percent,'fat_percent':client_equiv[0].fat_percent,'full_milk':client_equiv[0].full_milk,'semi_milk':client_equiv[0].semi_milk,'zero_milk':client_equiv[0].zero_milk,'fruits':client_equiv[0].fruits,'vegetables':client_equiv[0].vegetables,'bread_cereals':client_equiv[0].bread_cereals,'full_meat':client_equiv[0].full_meat,'semi_meat':client_equiv[0].semi_meat,'zero_meat':client_equiv[0].zero_meat,'fat':client_equiv[0].fat})
+
+    # client data id user whant to edit
+    
+    #measurements data for chart
+    data = serializers.serialize("json",Measurements.objects.all().order_by('date').filter(client_id=client_id))
+    equiv_data = serializers.serialize("json",Equivalents.objects.all().filter(client_id=client_id))
+
+
+    if request.method == 'POST':
+        
+        print(request.POST)
+        print('try to check and update')
+        if request.POST.get('action_button')=='save_client_info':
+            print('save time')
+            edit_client = AddClients(request.POST)
+            
+            if edit_client.is_valid():
+                print('time to save')
+                # load the profile instance created by the signal
+                name=request.POST['name']
+                status=request.POST['status']
+                gender=request.POST['gender']
+                birthday=request.POST['birthday']
+                age=request.POST['age']
+                height=request.POST['height']
+                target_weight=request.POST['target_weight']
+                email=request.POST['email']
+                phone=request.POST['phone']
+                address=request.POST['address']
+
+                Clients.objects.filter(id=client_id).update(name=name,status=status,gender=gender,birthday=birthday, age=age, height=height,target_weight=target_weight,email=email,phone=phone,address=address,)
+
+                messages.success(request,''+name+' has been updated! If you want to see ')
+                target_client = Clients.objects.all().filter(id=client_id)
+                return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show'})
+            else:
+                print('not valid')
+                
+                return render(request, 'client_page.html',{'target_client':target_client, 'edit_client': edit_client,'client_measurements':client_measurements,'edit_client':edit_client,'openmodal':'edit_client_modal'})
+    
+        #############################################################
+       
+
+    print('lets go')
+
+
+    return render(request, 'client_page_new.html',{'target_client':target_client,'edit_client':edit_client,'client_measurements':client_measurements,'add_measurment_form':add_measurment_form,'data':data,'client_equiv':client_equiv,'edit_equiv':edit_equiv,'equiv_data':equiv_data})
 

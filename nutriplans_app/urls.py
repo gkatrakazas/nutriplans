@@ -11,6 +11,7 @@ urlpatterns = [
     path('',include("django.contrib.auth.urls")), 
     path('workspace', views.workspace, name = 'workspace'), 
     path('client_page/<int:client_id>/', views.client_page, name = 'client_page'),
+    path('client_page_new/<int:client_id>/', views.client_page_new, name = 'client_page_new'),
     path('create_plan/<int:client_id>/', views.create_plan, name = 'create_plan'),
 
     

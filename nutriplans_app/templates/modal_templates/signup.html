@@ -1,6 +1,13 @@
 <head>
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
+  <style>
+    input:-internal-autofill-selected {
+    appearance: menulist-button;
+    background-image: none !important;
+    background-color: white!important;
+    }
+  </style>
 </head>
 <div class="modal fade" id="signup_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
 aria-hidden="true">
@@ -31,6 +38,8 @@ aria-hidden="true">
           </p>
         {% endfor %}
         <button type="submit">Sign up</button>
+        <button type="submit" class="btn btn-primary btn-block" style="background-color: coral;">Sign up</button>
+
       </form>
       
 

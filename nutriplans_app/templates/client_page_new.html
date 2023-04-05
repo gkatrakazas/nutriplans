@@ -1,0 +1,121 @@
+<head>
+  {% load static %}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'css/client_info_table.css' %}"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/client_page.css' %}"/>
+
+
+</head>
+<style>
+  .layout {
+    width: 100%;
+    background-color: rgba(255, 127, 80, 0.2);
+    display: grid;
+    grid:
+      "client_menu" auto
+      "client_body" auto
+      / 100%;
+    gap: 8px;
+}
+
+  .client_menu { grid-area: client_menu; }
+  .client_body { grid-area: client_body; }
+
+
+  .layout2 {
+  width: 100%;
+
+  display: grid;
+  grid:
+    "client_info_1 client_info_2" 1fr
+    / 50% 50%;
+  gap: 8px;
+}
+
+.client_info_1 {grid-area: client_info_1; }
+.client_info_2 { grid-area: client_info_2; }
+</style>
+
+<body>
+  <nav>
+      {% include "./base.html" %}
+  </nav>
+  <section class="layout">
+    <div class="client_menu">
+      {% include "./client_base.html" %}
+    </div>
+  <div class="client_body">
+    <form method="post" name="edit_client_form" id="edit_client_form">
+      {% csrf_token %}
+    <section class="layout2">
+
+
+        <div class="client_info_1">
+        <div style="margin:5%; padding:5%; text-align: center; background-color: white; ">
+          <i class="fa fa-user-circle" style="font-size:60px;"></i>
+          {% for field in target_client %}
+          <h3>{{ field.name }}</h3>
+          <h5>Ηλικία: {{ field.age }}</h5>
+
+          {% endfor %}
+        </div>
+
+        <div style="margin:5%; padding:5%; background-color: white; ">
+
+                <input type="hidden" name="target_mes_id" value="{{target_mes_id}}" >
+                <p>
+                {{ edit_client.notes.label }}
+                {{ edit_client.notes }}
+                  {% if edit_client.notes.help_text %}
+                    <small style="color: grey">{{ edit_client.notes.help_text }}</small>
+                  {% endif %}
+                  {% for error in edit_client.notes.errors %}
+                    <p style="color: red">{{ error }}</p>
+                  {% endfor %}
+                  </p>
+                
+        </div>
+
+        </div>
+
+        <div class="client_info_2">
+        <div style="margin:5%; padding:5%; background-color: white; ">
+
+            {% for field in edit_client %}
+            {% if field.label != 'Notes'%}
+              <p>
+                {{ field.label }}
+                {{ field }}
+                {% if field.help_text %}
+                  <small style="color: grey">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                  <p style="color: red">{{ error }}</p>
+                {% endfor %}
+              </p>
+            {% endif %}
+            {% endfor %}
+            
+          
+        </div>
+        
+        </div>
+      
+    </section>
+  </form>
+  </div>
+  </section>
+
+</body>
+
+<script>
+  function validate_then_submit() {
+    alert('hi')
+        document.forms['edit_client_form'].submit();
+  }
+
+</script>
+
+
+
+  
