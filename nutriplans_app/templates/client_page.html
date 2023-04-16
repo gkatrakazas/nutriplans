@@ -7,7 +7,22 @@
 </head>
 <style>
 
+
 .layout {
+  width: 100%;
+  background-color: rgba(255, 127, 80, 0.2);
+    min-height: 100%;
+  display: grid;
+  padding: 2%;
+  grid:"column1 column2" 100%
+    / 25% 75%;
+  gap: 18px;
+
+  align-content: start;
+  align-items: start;
+}
+
+/* .layout {
   width: 100%;
   background-color: rgba(255, 127, 80, 0.2);
     min-height: 100%;
@@ -22,7 +37,8 @@
 
   align-content: start;
   align-items: start;
-}
+} */
+
 
 .column1 { grid-area: column1; }
 .column2 { grid-area: column2; }
@@ -35,9 +51,9 @@
   </nav>
 
   <section class="layout"> 
-    <div class="header">
+    <!-- <div class="header">
       {% include "./client_base.html" %}
-    </div>
+    </div> -->
     <div class="column1 ">
 
       <h3>Client Information</h3>

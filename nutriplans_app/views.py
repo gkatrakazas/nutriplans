@@ -134,14 +134,17 @@ def signup(request):
 @group_required('Nutrition')
 @login_required(login_url='signin')
 def workspace(request):
+
+    print('\n--> workspace')
     if request.user.is_authenticated:
 
         #get user_id
         login_user_id=request.user.id
-
+        print('\nlogin_user_id:',login_user_id)
         # get all clients from current user
         client_list = Clients.objects.all().filter(user_id=login_user_id)
         
+        print(client_list)
         # get addpatientform
         add_client_form=AddClients()
 
@@ -184,7 +187,7 @@ def workspace(request):
                 #action="{% url 'client_page' field.user_id field.id %}"
                 print ('redirect')
                 target_client_id=request.POST['target_row']
-                return redirect('client_page_new',client_id=target_client_id)
+                return redirect('client_page',client_id=target_client_id)
 
             if request.POST.get('action_button')=='delete_client':
                 
