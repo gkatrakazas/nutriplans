@@ -2,7 +2,6 @@ from functools import wraps
 from pyexpat.errors import messages
 from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseForbidden
-from constraint import *
 from nutriplans_app.forms import AddClients
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
@@ -20,10 +19,10 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from email.mime.image import MIMEImage
 import os 
-import constraint
 import time
 import random
-from constraint import Problem, AllDifferentConstraint
+import constraint
+from constraint import Problem
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
@@ -310,7 +309,8 @@ def client_page(request, client_id):
                 client_measurements = Measurements.objects.all().order_by('-date').filter(client_id=client_id)
                 data = serializers.serialize("json",Measurements.objects.all().order_by('date').filter(client_id=client_id))
 
-                return render(request, 'client_page.html',{'target_client':target_client,'add_measurment_form':add_measurment_form,'client_measurements':client_measurements,'action_info':'show','data':data})  
+                equiv_data = serializers.serialize("json",Equivalents.objects.all().filter(client_id=client_id))
+                return render(request, 'client_page.html',{'target_client':target_client,'add_measurment_form':add_measurment_form,'client_measurements':client_measurements,'action_info':'show','data':data,'equiv_data':equiv_data})  
 
             else:
                 print('not valid')
@@ -340,6 +340,69 @@ def client_page(request, client_id):
             edit_mes=Measurements.objects.all().filter(id=target_mes_id)
             edit_measurement_form = AddMeasurements(initial={'id':edit_mes[0].id,'date': edit_mes[0].date,'activity_factor': edit_mes[0].activity_factor,'weight': edit_mes[0].weight,'fat': edit_mes[0].fat,'muscle_mass': edit_mes[0].muscle_mass,'bone_mass': edit_mes[0].bone_mass,'liquids':edit_mes[0].liquids,'vinceral_fat':edit_mes[0].vinceral_fat,'client_id':edit_mes[0].client_id})
             return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'show','add_measurment_form':add_measurment_form,'data':data,'edit_measurement_form':edit_measurement_form,'openmodal':'edit_measurements_modal','target_mes_id':target_mes_id})
+        
+        if request.POST.get('action_button')=='calculate_equivalents':
+            
+            print('calculate equivalents')
+            edit_equiv = EditEquivalents(request.POST)
+            
+            if edit_equiv.is_valid():
+                print('time to save equiv')
+                
+                target_calories=request.POST.get('target_calories')
+                if target_calories=='':
+                    target_calories=0.0
+                
+                carbohydrates_percent=request.POST.get('carbohydrates_percent')
+                if carbohydrates_percent=='':
+                    carbohydrates_percent=0
+
+                proteins_percent=request.POST.get('proteins_percent')
+                if proteins_percent=='':
+                    proteins_percent=0
+                
+                fat_percent=request.POST.get('fat_percent')
+                if fat_percent=='':
+                    fat_percent=0
+
+
+                result=recommend_plan(int(float(target_calories)),int(carbohydrates_percent),int(proteins_percent),int(fat_percent))
+                print(result['FM'])
+
+                full_milk=result['FM']
+                semi_milk=result['SML']
+                zero_milk=result['ZML']
+                fruits=result['FR']
+                vegetables=result['VG']
+                bread_cereals=result['BR']
+                full_meat=result['FMT']
+                semi_meat=result['SMT']
+                zero_meat=result['ZMT']
+                fat=result['F']
+
+                Equivalents.objects.filter(client_id=client_id).update(target_calories=target_calories,carbohydrates_percent=carbohydrates_percent,proteins_percent=proteins_percent,fat_percent=fat_percent, full_milk=full_milk, semi_milk=semi_milk,zero_milk=zero_milk,fruits=fruits,vegetables=vegetables,bread_cereals=bread_cereals,full_meat=full_meat,semi_meat=semi_meat,zero_meat=zero_meat,fat=fat)
+
+            
+                messages.success(request,'Equivalents has been calculated!')
+
+                edit_equiv=EditEquivalents(initial={'target_calories':client_equiv[0].target_calories,'carbohydrates_percent':client_equiv[0].carbohydrates_percent,'proteins_percent':client_equiv[0].proteins_percent,'fat_percent':client_equiv[0].fat_percent,'full_milk':client_equiv[0].full_milk,'semi_milk':client_equiv[0].semi_milk,'zero_milk':client_equiv[0].zero_milk,'fruits':client_equiv[0].fruits,'vegetables':client_equiv[0].vegetables,'bread_cereals':client_equiv[0].bread_cereals,'full_meat':client_equiv[0].full_meat,'semi_meat':client_equiv[0].semi_meat,'zero_meat':client_equiv[0].zero_meat,'fat':client_equiv[0].fat})
+
+                
+                client_equiv= Equivalents.objects.all().filter(client_id=client_id)
+                print(client_id)
+                edit_equiv=EditEquivalents(initial={'target_calories':client_equiv[0].target_calories,'carbohydrates_percent':client_equiv[0].carbohydrates_percent,'proteins_percent':client_equiv[0].proteins_percent,'fat_percent':client_equiv[0].fat_percent,'full_milk':client_equiv[0].full_milk,'semi_milk':client_equiv[0].semi_milk,'zero_milk':client_equiv[0].zero_milk,'fruits':client_equiv[0].fruits,'vegetables':client_equiv[0].vegetables,'bread_cereals':client_equiv[0].bread_cereals,'full_meat':client_equiv[0].full_meat,'semi_meat':client_equiv[0].semi_meat,'zero_meat':client_equiv[0].zero_meat,'fat':client_equiv[0].fat})
+
+                # client data id user whant to edit
+                
+                #measurements data for chart
+                data = serializers.serialize("json",Measurements.objects.all().order_by('date').filter(client_id=client_id))
+                equiv_data = serializers.serialize("json",Equivalents.objects.all().filter(client_id=client_id))
+
+                return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'action_info':'show','add_measurment_form':add_measurment_form,'data':data,'client_equiv':client_equiv,'equiv_data':equiv_data,'edit_equiv':edit_equiv})
+            else:
+                print('not valid')
+                messages.warning(request,'Equivalents has Not been updated!')
+                return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'edit_client':edit_client,'action_info':'edit'})
 
         if request.POST.get('action_button')=='edit_save_measurements_button':
             print('update measurment time')
@@ -439,8 +502,9 @@ def client_page(request, client_id):
 
                 messages.success(request,'Equivalents has been updated!')
                 client_equiv= Equivalents.objects.all().filter(client_id=client_id)
-                equiv_data = serializers.serialize("json",Equivalents.objects.all().filter(client_id=client_id))
-                return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'action_info':'show','add_measurment_form':add_measurment_form,'data':data,'client_equiv':client_equiv,'edit_equiv':edit_equiv})
+                edit_equiv=EditEquivalents(initial={'target_calories':client_equiv[0].target_calories,'carbohydrates_percent':client_equiv[0].carbohydrates_percent,'proteins_percent':client_equiv[0].proteins_percent,'fat_percent':client_equiv[0].fat_percent,'full_milk':client_equiv[0].full_milk,'semi_milk':client_equiv[0].semi_milk,'zero_milk':client_equiv[0].zero_milk,'fruits':client_equiv[0].fruits,'vegetables':client_equiv[0].vegetables,'bread_cereals':client_equiv[0].bread_cereals,'full_meat':client_equiv[0].full_meat,'semi_meat':client_equiv[0].semi_meat,'zero_meat':client_equiv[0].zero_meat,'fat':client_equiv[0].fat})
+                
+                return render(request, 'client_page.html',{'target_client':target_client,'client_measurements':client_measurements,'action_info':'show','add_measurment_form':add_measurment_form,'data':data,'client_equiv':client_equiv,'edit_equiv':edit_equiv,'equiv_data':equiv_data})
             else:
                 print('not valid')
                 messages.warning(request,'Equivalents has Not been updated!')
@@ -463,8 +527,8 @@ def create_plan(request,client_id):
 
     return render(request, 'create_plan.html')
 
-@group_required('Nutrition')
-def recommend_plan(request, TC, CARB, PROT, FAT):
+# @group_required('Nutrition')
+def recommend_plan(TC, CARB, PROT, FAT):
     # Create a new constraint problem
     problem = Problem(constraint.MinConflictsSolver())
 
@@ -474,13 +538,12 @@ def recommend_plan(request, TC, CARB, PROT, FAT):
         problem.addVariable(var, range(0, 10))
 
     # Inputs
-    # TC = 2000
-    # CARB = 0.3
-    # PROT = 0.4
-    # FAT = 0.3
+    CARB = CARB*0.01
+    PROT = PROT*0.01
+    FAT = FAT*0.01
 
     #flex parameter
-    flex = 0.31 * TC
+    flex = 0.40 * TC
 
     # Define constraints
     def carb_constraintUpLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
@@ -523,7 +586,7 @@ def recommend_plan(request, TC, CARB, PROT, FAT):
 
     # Get solutions
     solutions = problem.getSolution()
-
+    print('solution',solutions)
     return solutions
 
 @group_required('Nutrition')
