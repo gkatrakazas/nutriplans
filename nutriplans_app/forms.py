@@ -13,8 +13,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from nutriplans_app.models import Clients, Equivalents, Clients
 
 
-
-
 class CustomUserCreationForm(UserCreationForm):  
     username = forms.CharField(label='username', min_length=5, max_length=150)  
     email = forms.EmailField(label='email')  

@@ -2,8 +2,7 @@ from functools import wraps
 from pyexpat.errors import messages
 from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseForbidden
-from grpc import Status
-from numpy import block
+from constraint import *
 from nutriplans_app.forms import AddClients
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
@@ -21,6 +20,10 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from email.mime.image import MIMEImage
 import os 
+import constraint
+import time
+import random
+from constraint import Problem, AllDifferentConstraint
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
@@ -460,6 +463,68 @@ def create_plan(request,client_id):
 
     return render(request, 'create_plan.html')
 
+@group_required('Nutrition')
+def recommend_plan(request, TC, CARB, PROT, FAT):
+    # Create a new constraint problem
+    problem = Problem(constraint.MinConflictsSolver())
+
+    # Define variables and their respective domains
+    variables = ["FM", "SML", "ZML", "FR", "VG", "BR", "FMT", "SMT", "ZMT", "F"]
+    for var in variables:
+        problem.addVariable(var, range(0, 10))
+
+    # Inputs
+    # TC = 2000
+    # CARB = 0.3
+    # PROT = 0.4
+    # FAT = 0.3
+
+    #flex parameter
+    flex = 0.31 * TC
+
+    # Define constraints
+    def carb_constraintUpLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 12 * FM + 12 * SML + 12 * ZML + 15 * FR + 5 * VG + 15 * BR + 0 * FMT + 0 * SMT + 0 * ZMT + 0 * F - CARB * TC <= flex 
+
+    def carb_constraintBottomLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 12 * FM + 12 * SML + 12 * ZML + 15 * FR + 5 * VG + 15 * BR + 0 * FMT + 0 * SMT + 0 * ZMT + 0 * F - CARB * TC >= -flex
+
+    def prot_constraintUpLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 8 * FM + 8 * SML + 8 * ZML + 0 * FR + 2 * VG + 3 * BR + 7 * FMT + 7 * SMT + 7 * ZMT + 0 * F - PROT * TC <= flex
+    
+    def prot_constraintBottomLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 8 * FM + 8 * SML + 8 * ZML + 0 * FR + 2 * VG + 3 * BR + 7 * FMT + 7 * SMT + 7 * ZMT + 0 * F - PROT * TC >= -flex
+
+    def fat_constraintUpLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 8 * FM + 5 * SML + 0 * ZML + 0 * FR + 0 * VG + 0 * BR + 8 * FMT + 5 * SMT + 3 * ZMT + 0 * F - FAT * TC <= flex
+    
+    def fat_constraintBottomLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 8 * FM + 5 * SML + 0 * ZML + 0 * FR + 0 * VG + 0 * BR + 8 * FMT + 5 * SMT + 3 * ZMT + 0 * F - FAT * TC >= -flex
+
+    def cal_constraintUpLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 152 * FM + 125 * SML + 80 * ZML + 60 * FR + 28 * VG + 72 * BR + 100 * FMT + 73 * SMT + 55 * ZMT + 0 * F <= TC + 100
+
+    def cal_constraintBottomLimit(FM, SML, ZML, FR, VG, BR, FMT, SMT, ZMT, F):
+        return 152 * FM + 125 * SML + 80 * ZML + 60 * FR + 28 * VG + 72 * BR + 100 * FMT + 73 * SMT + 55 * ZMT + 0 * F >= TC - 100
+
+    # Add constraints to the problem
+    problem.addConstraint(carb_constraintUpLimit, variables)
+    problem.addConstraint(carb_constraintBottomLimit, variables)
+
+    problem.addConstraint(prot_constraintUpLimit, variables)
+    problem.addConstraint(prot_constraintBottomLimit, variables)
+
+    problem.addConstraint(fat_constraintUpLimit, variables)
+    problem.addConstraint(fat_constraintBottomLimit, variables)
+
+    problem.addConstraint(cal_constraintUpLimit, variables)
+    problem.addConstraint(cal_constraintBottomLimit, variables)
+
+
+    # Get solutions
+    solutions = problem.getSolution()
+
+    return solutions
 
 @group_required('Nutrition')
 def client_page_new(request,client_id):
